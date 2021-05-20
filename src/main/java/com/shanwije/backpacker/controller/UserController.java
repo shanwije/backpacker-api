@@ -35,9 +35,7 @@ public class UserController {
     @PostMapping("/token")
     public Mono<ResponseEntity<?>> login(@RequestBody User user) {
         return userRepository.findByUsername(user.getUsername()).map((userDetails) -> {
-            String encoded = getPasswordEncoder().encode(user.getPassword());
-            String password = userDetails.getPassword();
-            if (getPasswordEncoder().matches(user.getPassword(), password)) {
+            if (getPasswordEncoder().matches(user.getPassword(), userDetails.getPassword())) {
                 return ResponseEntity.ok(jwtUtil.generateToken(user));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
