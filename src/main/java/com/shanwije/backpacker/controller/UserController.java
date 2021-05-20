@@ -1,7 +1,11 @@
 package com.shanwije.backpacker.controller;
 
+import com.shanwije.backpacker.config.security.JWTUtil;
+import com.shanwije.backpacker.config.security.CustomPasswordEncoder;
 import com.shanwije.backpacker.entities.User;
+import com.shanwije.backpacker.repository.UserRepository;
 import com.shanwije.backpacker.service.UserService;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,22 +14,37 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static com.shanwije.backpacker.config.security.CustomPasswordEncoder.*;
+import static com.shanwije.backpacker.config.security.CustomPasswordEncoder.getPasswordEncoder;
+
 @Log4j2
 @RestController
+@AllArgsConstructor
 @RequestMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
 
-    final
-    UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    final UserService userService;
+    private UserRepository userRepository;
+    private JWTUtil jwtUtil;
 
     @GetMapping()
     public Flux<User> getAll() {
         return userService.findAll();
     }
+
+    @PostMapping("/token")
+    public Mono<ResponseEntity<?>> login(@RequestBody User user) {
+        return userRepository.findByUsername(user.getUsername()).map((userDetails) -> {
+            String encoded = getPasswordEncoder().encode(user.getPassword());
+            String password = userDetails.getPassword();
+            if (getPasswordEncoder().matches(user.getPassword(), password)) {
+                return ResponseEntity.ok(jwtUtil.generateToken(user));
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        }).defaultIfEmpty(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+    }
+
 
     @GetMapping("/{id}")
     public Mono<ResponseEntity<User>> getById(@PathVariable(value = "id")String id) {
