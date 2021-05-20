@@ -1,4 +1,4 @@
-package com.shanwije.backpacker.config.security;
+package com.shanwije.backpacker.config;
 
 import com.shanwije.backpacker.repository.UserRepository;
 import lombok.AllArgsConstructor;

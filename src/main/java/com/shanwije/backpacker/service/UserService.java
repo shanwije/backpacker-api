@@ -5,12 +5,14 @@ import com.shanwije.backpacker.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
 @Log4j2
 @AllArgsConstructor
+@Transactional
 public class UserService {
 
     private final UserRepository userRepository;

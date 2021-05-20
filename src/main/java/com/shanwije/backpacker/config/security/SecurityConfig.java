@@ -26,7 +26,7 @@ public class SecurityConfig {
     String roles;
 
     @Bean
-    public MapReactiveUserDetailsService userDetailsService(){
+    public MapReactiveUserDetailsService userDetailsService() {
 
         UserDetails userDetails = User.withUsername(username)
                 .password(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password))
@@ -39,12 +39,24 @@ public class SecurityConfig {
 
     @Bean
     public SecurityWebFilterChain filterChain(ServerHttpSecurity http) {
-        return http.authorizeExchange(
-                authorizeExchangeSpec -> authorizeExchangeSpec.anyExchange().authenticated()
-        ).exceptionHandling()
-                .authenticationEntryPoint((res, err) -> Mono.fromRunnable(()-> {
+        return http
+                .authorizeExchange(
+                        authorizeExchangeSpec -> {
+                            authorizeExchangeSpec
+                                    .pathMatchers("/").permitAll()
+                                    .pathMatchers("/version").permitAll()
+                                    .pathMatchers("/health").permitAll()
+                                    .pathMatchers("/health/**").permitAll()
+                                    .pathMatchers("/actuator/**").permitAll()
+                                    .pathMatchers("/swagger-resources/**").permitAll()
+                                    .pathMatchers("/swagger-ui/**").permitAll()
+                                    .pathMatchers("/v2/api-docs").permitAll()
+                                    .pathMatchers("/**").authenticated();
+                        }
+                ).exceptionHandling()
+                .authenticationEntryPoint((res, err) -> Mono.fromRunnable(() -> {
                     res.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                })).accessDeniedHandler((res,err) -> Mono.fromRunnable(() -> {
+                })).accessDeniedHandler((res, err) -> Mono.fromRunnable(() -> {
                     res.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
                 })).and()
                 .httpBasic((Customizer.withDefaults()))
