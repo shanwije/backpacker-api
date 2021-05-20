@@ -3,18 +3,12 @@ package com.shanwije.backpacker.controller;
 import com.shanwije.backpacker.entities.User;
 import com.shanwije.backpacker.service.UserService;
 import lombok.extern.log4j.Log4j2;
-import org.reactivestreams.Publisher;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.awt.*;
 
 @Log4j2
 @RestController
@@ -56,8 +50,9 @@ public class UserController {
                                       @RequestBody User user) {
         return userService.findById(id)
                 .flatMap(user1 -> {
-                    user1.setEmail(user.getEmail());
+                    user1.setUsername(user.getUsername());
                     user1.setPassword(user.getPassword());
+                    user1.setRoles(user.getRoles());
                     return userService.save(user1);
                 })
                 .map(updatedUser -> new ResponseEntity<>(updatedUser, HttpStatus.OK))

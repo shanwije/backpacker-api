@@ -4,6 +4,8 @@ import com.shanwije.backpacker.entities.User;
 import com.shanwije.backpacker.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -26,6 +28,7 @@ public class UserService {
     }
 
     public Mono<User> save(User user) {
+        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         return userRepository.save(user);
     }
 

@@ -1,39 +1,35 @@
 package com.shanwije.backpacker.config.security;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.shanwije.backpacker.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import reactor.core.publisher.Mono;
 
 @Configuration
 @EnableWebFluxSecurity
-public class SecurityConfig {
+public class SecurityConfiguration {
 
-    @Value("${spring.security.basic.auth.username}")
-    String username;
-    @Value("${spring.security.basic.auth.password}")
-    CharSequence password;
-    @Value("${spring.security.basic.auth.roles}")
-    String roles;
+    private UserRepository userRepository;
+
+    public SecurityConfiguration(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Bean
-    public MapReactiveUserDetailsService userDetailsService() {
+    ReactiveUserDetailsService userDetailsService(){
+        return (name) -> userRepository.findByUsername(name);
+    }
 
-        UserDetails userDetails = User.withUsername(username)
-                .password(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password))
-                .roles(roles)
-                .build();
-
-        return new MapReactiveUserDetailsService(userDetails);
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
 
@@ -51,6 +47,7 @@ public class SecurityConfig {
                                     .pathMatchers("/swagger-resources/**").permitAll()
                                     .pathMatchers("/swagger-ui/**").permitAll()
                                     .pathMatchers("/v2/api-docs").permitAll()
+                                    .pathMatchers("/user").permitAll()
                                     .pathMatchers("/**").authenticated();
                         }
                 ).exceptionHandling()
