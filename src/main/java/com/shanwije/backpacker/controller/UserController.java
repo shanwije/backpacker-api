@@ -1,9 +1,12 @@
 package com.shanwije.backpacker.controller;
 
-import com.shanwije.backpacker.config.security.JWTUtil;
-import com.shanwije.backpacker.config.security.CustomPasswordEncoder;
+import com.shanwije.backpacker.security.AuthService;
+import com.shanwije.backpacker.security.config.JWTUtil;
 import com.shanwije.backpacker.entities.User;
 import com.shanwije.backpacker.repository.UserRepository;
+import com.shanwije.backpacker.security.request.UserAuthenticationRequest;
+import com.shanwije.backpacker.security.request.UserRegistrationRequest;
+import com.shanwije.backpacker.security.response.UserAuthenticationResponse;
 import com.shanwije.backpacker.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -14,8 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static com.shanwije.backpacker.config.security.CustomPasswordEncoder.*;
-import static com.shanwije.backpacker.config.security.CustomPasswordEncoder.getPasswordEncoder;
+import static com.shanwije.backpacker.security.config.CustomPasswordEncoder.getPasswordEncoder;
 
 @Log4j2
 @RestController
@@ -23,11 +25,18 @@ import static com.shanwije.backpacker.config.security.CustomPasswordEncoder.getP
 @RequestMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
 
-    final UserService userService;
-    private UserRepository userRepository;
-    private JWTUtil jwtUtil;
+//    final UserService userService;
+//    private UserRepository userRepository;
+//    private JWTUtil jwtUtil;
+    AuthService authService;
 
-    @GetMapping()
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<UserAuthenticationResponse> register(@RequestBody UserRegistrationRequest userRegistrationRequest){
+        return authService.register(userRegistrationRequest);
+    }
+
+/*    @GetMapping()
     public Flux<User> getAll() {
         return userService.findAll();
     }
@@ -74,5 +83,5 @@ public class UserController {
                 })
                 .map(updatedUser -> new ResponseEntity<>(updatedUser, HttpStatus.OK))
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
+    }*/
 }

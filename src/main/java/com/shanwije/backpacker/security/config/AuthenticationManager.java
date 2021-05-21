@@ -1,8 +1,7 @@
-package com.shanwije.backpacker.config.security;
+package com.shanwije.backpacker.security.config;
 
 import com.shanwije.backpacker.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;

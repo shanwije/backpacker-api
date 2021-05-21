@@ -1,8 +1,5 @@
-package com.shanwije.backpacker.config.security;
+package com.shanwije.backpacker.security.config;
 
-import lombok.NoArgsConstructor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 

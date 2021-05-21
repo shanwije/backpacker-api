@@ -1,6 +1,6 @@
 package com.shanwije.backpacker.service;
 
-import com.shanwije.backpacker.config.security.CustomPasswordEncoder;
+import com.shanwije.backpacker.security.config.CustomPasswordEncoder;
 import com.shanwije.backpacker.entities.User;
 import com.shanwije.backpacker.repository.UserRepository;
 import lombok.AllArgsConstructor;

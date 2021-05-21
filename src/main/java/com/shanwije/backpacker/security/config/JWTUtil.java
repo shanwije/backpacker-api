@@ -1,4 +1,4 @@
-package com.shanwije.backpacker.config.security;
+package com.shanwije.backpacker.security.config;
 
 import com.shanwije.backpacker.entities.User;
 import io.jsonwebtoken.Claims;
