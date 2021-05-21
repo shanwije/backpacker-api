@@ -1,23 +1,16 @@
 package com.shanwije.backpacker.controller;
 
 import com.shanwije.backpacker.security.AuthService;
-import com.shanwije.backpacker.security.config.JWTUtil;
-import com.shanwije.backpacker.entities.User;
-import com.shanwije.backpacker.repository.UserRepository;
 import com.shanwije.backpacker.security.request.UserAuthenticationRequest;
 import com.shanwije.backpacker.security.request.UserRegistrationRequest;
+import com.shanwije.backpacker.security.response.TokenAuthenticationResponse;
 import com.shanwije.backpacker.security.response.UserAuthenticationResponse;
-import com.shanwije.backpacker.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import static com.shanwije.backpacker.security.config.CustomPasswordEncoder.getPasswordEncoder;
 
 @Log4j2
 @RestController
@@ -35,6 +28,13 @@ public class UserController {
     public Mono<UserAuthenticationResponse> register(@RequestBody UserRegistrationRequest userRegistrationRequest){
         return authService.register(userRegistrationRequest);
     }
+
+    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<TokenAuthenticationResponse> getToken(@RequestBody UserAuthenticationRequest userAuthenticationRequest){
+        return authService.getToken(userAuthenticationRequest);
+    }
+
 
 /*    @GetMapping()
     public Flux<User> getAll() {

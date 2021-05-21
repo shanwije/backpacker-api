@@ -1,13 +1,12 @@
 package com.shanwije.backpacker.security.config;
 
-import com.shanwije.backpacker.repository.UserRepository;
+import com.shanwije.backpacker.security.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authorization.HttpStatusServerAccessDeniedHandler;
@@ -23,12 +22,6 @@ public class SecurityConfiguration {
 
     private AuthenticationManager authenticationManager;
     private SecurityContextRepository securityContextRepository;
-
-
-    @Bean
-    ReactiveUserDetailsService userDetailsService(){
-        return (name) -> userRepository.findByUsername(name);
-    }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -50,8 +43,9 @@ public class SecurityConfiguration {
                                     .pathMatchers("/swagger-resources/**").permitAll()
                                     .pathMatchers("/swagger-ui/**").permitAll()
                                     .pathMatchers("/v2/api-docs").permitAll()
-//                                    .pathMatchers("/user").permitAll()
-                                    .pathMatchers("/user/token").permitAll()
+                                    .pathMatchers("/roles").permitAll()
+                                    .pathMatchers("/user/register").permitAll()
+                                    .pathMatchers("/user/authenticate").permitAll()
                                     .pathMatchers("/**").authenticated();
                         }
                 ).exceptionHandling()

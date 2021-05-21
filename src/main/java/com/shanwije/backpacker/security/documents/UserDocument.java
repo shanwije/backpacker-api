@@ -1,24 +1,24 @@
 package com.shanwije.backpacker.security.documents;
 
-import com.shanwije.backpacker.security.request.UserAuthenticationRequest;
 import com.shanwije.backpacker.security.request.UserRegistrationRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.CredentialsContainer;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
 import java.util.List;
 
-@AllArgsConstructor
-@Data
+
+
 @Document(collection = "users")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDocument implements UserDetails, CredentialsContainer {
 
     @Id
@@ -30,7 +30,6 @@ public class UserDocument implements UserDetails, CredentialsContainer {
 
     private boolean active = true;
 
-    @DBRef
     @NonNull
     private List<? extends RoleDocument> authorities;
 
