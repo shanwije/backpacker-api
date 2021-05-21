@@ -2,7 +2,7 @@ package com.shanwije.backpacker.service;
 
 import com.shanwije.backpacker.security.repository.UserRepository;
 import com.shanwije.backpacker.security.request.UserRegistrationRequest;
-import com.shanwije.backpacker.security.response.UserRegistrationResponse;
+import com.shanwije.backpacker.security.response.UserResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,14 +27,14 @@ public class CustomUsersDetailsService implements ReactiveUserDetailsService {
                 .cast(UserDetails.class);
     }
 
-    public Mono<UserRegistrationResponse> findById(String id) {
+    public Mono<UserResponse> findById(String id) {
         return userRepository.findById(id).flatMap(userDocument ->
-                Mono.just(new UserRegistrationResponse(userDocument)));
+                Mono.just(new UserResponse(userDocument)));
     }
 
-    public Flux<UserRegistrationResponse> findAll() {
+    public Flux<UserResponse> findAll() {
         return userRepository.findAll().flatMap(userDocument ->
-                Mono.just(new UserRegistrationResponse(userDocument)));
+                Mono.just(new UserResponse(userDocument)));
     }
 
     public Mono<Void> delete(String id) {
@@ -42,11 +42,11 @@ public class CustomUsersDetailsService implements ReactiveUserDetailsService {
                 userRepository.delete(userDocument));
     }
 
-    public Mono<UserRegistrationResponse> update(String id, UserRegistrationRequest userRequest) {
+    public Mono<UserResponse> update(String id, UserRegistrationRequest userRequest) {
         return userRepository.findById(id).flatMap(userDocument -> {
             userDocument.setUserRegistrationRequest(userRequest);
             return userRepository.save(userDocument).flatMap(userDocument1 ->
-                    Mono.just(new UserRegistrationResponse(userDocument1)));
+                    Mono.just(new UserResponse(userDocument1)));
         });
     }
 }

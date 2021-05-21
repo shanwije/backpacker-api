@@ -18,10 +18,10 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 public class SecurityConfiguration {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private AuthenticationManager authenticationManager;
-    private SecurityContextRepository securityContextRepository;
+    private final AuthenticationManager authenticationManager;
+    private final SecurityContextRepository securityContextRepository;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {

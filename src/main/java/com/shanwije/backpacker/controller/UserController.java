@@ -4,7 +4,7 @@ import com.shanwije.backpacker.security.AuthService;
 import com.shanwije.backpacker.security.request.UserAuthenticationRequest;
 import com.shanwije.backpacker.security.request.UserRegistrationRequest;
 import com.shanwije.backpacker.security.response.TokenAuthenticationResponse;
-import com.shanwije.backpacker.security.response.UserAuthenticationResponse;
+import com.shanwije.backpacker.security.response.UserResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -18,20 +18,20 @@ import reactor.core.publisher.Mono;
 @RequestMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
 
-//    final UserService userService;
+    //    final UserService userService;
 //    private UserRepository userRepository;
 //    private JWTUtil jwtUtil;
     AuthService authService;
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<UserAuthenticationResponse> register(@RequestBody UserRegistrationRequest userRegistrationRequest){
+    public Mono<UserResponse> register(@RequestBody UserRegistrationRequest userRegistrationRequest) {
         return authService.register(userRegistrationRequest);
     }
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public Mono<TokenAuthenticationResponse> getToken(@RequestBody UserAuthenticationRequest userAuthenticationRequest){
+    public Mono<TokenAuthenticationResponse> getToken(@RequestBody UserAuthenticationRequest userAuthenticationRequest) {
         return authService.getToken(userAuthenticationRequest);
     }
 

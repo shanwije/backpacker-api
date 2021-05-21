@@ -1,4 +1,5 @@
 package com.shanwije.backpacker.security.config;
+
 import com.shanwije.backpacker.security.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -11,8 +12,8 @@ import reactor.core.publisher.Mono;
 public class AuthenticationManager implements ReactiveAuthenticationManager {
 
 
-    private JWTUtil jwtUtil;
-    private UserRepository userRepository;
+    private final JWTUtil jwtUtil;
+    private final UserRepository userRepository;
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {

@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.List;
 
 
-
 @Document(collection = "users")
 @Data
 @AllArgsConstructor
@@ -28,7 +27,7 @@ public class UserDocument implements UserDetails, CredentialsContainer {
     @NonNull
     private String password;
 
-    private boolean active = true;
+    private boolean active;
 
     @NonNull
     private List<? extends RoleDocument> authorities;
@@ -38,11 +37,11 @@ public class UserDocument implements UserDetails, CredentialsContainer {
         this.setUserRegistrationRequest(userRegistrationRequest);
     }
 
-    public void setUserRegistrationRequest(UserRegistrationRequest userRegistrationRequest){
-         if(!StringUtils.isBlank(userRegistrationRequest.getUsername())){
+    public void setUserRegistrationRequest(UserRegistrationRequest userRegistrationRequest) {
+        if (!StringUtils.isBlank(userRegistrationRequest.getUsername())) {
             this.username = userRegistrationRequest.getUsername();
         }
-        if(!StringUtils.isBlank(userRegistrationRequest.getPassword())){
+        if (!StringUtils.isBlank(userRegistrationRequest.getPassword())) {
             this.password = userRegistrationRequest.getPassword();
         }
     }
