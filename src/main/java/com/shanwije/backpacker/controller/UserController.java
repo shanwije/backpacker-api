@@ -9,8 +9,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import javax.validation.Valid;
 
 @Log4j2
 @RestController
@@ -25,13 +28,13 @@ public class UserController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<UserResponse> register(@RequestBody UserRegistrationRequest userRegistrationRequest) {
+    public Mono<UserResponse> register(@Valid @RequestBody UserRegistrationRequest userRegistrationRequest) {
         return authService.register(userRegistrationRequest);
     }
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public Mono<TokenAuthenticationResponse> getToken(@RequestBody UserAuthenticationRequest userAuthenticationRequest) {
+    public Mono<TokenAuthenticationResponse> getToken(@Valid @RequestBody UserAuthenticationRequest userAuthenticationRequest) {
         return authService.getToken(userAuthenticationRequest);
     }
 

@@ -12,10 +12,17 @@ public class UserResponse {
     private String id;
     private String username;
     private List<String> authorities;
+    private String email;
+    private String firstName;
+    private String lastName;
 
-    public UserResponse(UserDocument userDocument) {
-        this.id = userDocument.getId();
-        this.username = userDocument.getUsername();
-        this.authorities = userDocument.getAuthorities().stream().map(roleDocument -> roleDocument.getAuthority()).collect(Collectors.toList());
+    public UserResponse(UserDocument ud) {
+        this.id = ud.getId();
+        this.username = ud.getUsername();
+        this.email = ud.getEmail();
+        this.firstName = ud.getFirstName();
+        this.lastName = ud.getLastName();
+        this.authorities = ud.getAuthorities().stream()
+                .map(roleDocument -> roleDocument.getAuthority()).collect(Collectors.toList());
     }
 }

@@ -2,6 +2,7 @@ package com.shanwije.backpacker.security;
 
 import com.shanwije.backpacker.security.config.AuthenticationManager;
 import com.shanwije.backpacker.security.config.JWTUtil;
+import com.shanwije.backpacker.security.documents.RoleDocument;
 import com.shanwije.backpacker.security.documents.UserDocument;
 import com.shanwije.backpacker.security.repository.RolesRepository;
 import com.shanwije.backpacker.security.repository.UserRepository;
@@ -16,10 +17,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Arrays;
 
 
 @Service
@@ -38,18 +36,11 @@ public class AuthService {
                 .flatMap(__ -> Mono.error(new BadCredentialsException(userRegistrationRequest.getUsername() + " : username already exist")))
                 .switchIfEmpty(Mono.defer(() -> {
                     userRegistrationRequest.setPassword(passwordEncoder.encode(userRegistrationRequest.getPassword()));
-                    // TODO: 5/21/21 remove hardcoded role from below
-                    userRegistrationRequest.setAuthorities(Arrays.asList("ROLE_USER"));
-
-                    UserDocument userDocument = new UserDocument(userRegistrationRequest);
-                    userDocument.setActive(true);
-                    return Flux.fromIterable(userRegistrationRequest.getAuthorities())
-                            .flatMap(authority -> rolesRepository.findByAuthority(authority))
-                            .collectList().flatMap(roles -> {
-                                userDocument.setAuthorities(roles);
-                                return userRepository.save(userDocument).flatMap(userDocument1 ->
-                                        Mono.just(new UserResponse(userDocument1)));
-                            });
+                    return rolesRepository.findByAuthority("ROLE_USER").flatMap(defaultRole -> {
+                        UserDocument userDocument = new UserDocument(userRegistrationRequest, defaultRole);
+                        return userRepository.save(userDocument).flatMap(userDocument1 ->
+                                Mono.just(new UserResponse(userDocument1)));
+                    });
                 })).cast(UserResponse.class);
     }
 

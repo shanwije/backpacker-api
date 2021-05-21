@@ -1,21 +1,15 @@
 package com.shanwije.backpacker.security.request;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotBlank;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class RoleRequest {
-
+    @NotBlank(message = "Authority name can not be blank")
     private String authority;
-
-    public RoleRequest() {
-    }
-
-    public RoleRequest(String authority) {
-        this.authority = authority;
-    }
-
-    public String getAuthority() {
-        return authority;
-    }
-
-    public void setAuthority(String authority) {
-        this.authority = authority;
-    }
 }

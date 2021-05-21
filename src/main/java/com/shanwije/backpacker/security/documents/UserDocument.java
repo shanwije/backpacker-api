@@ -10,11 +10,17 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
+import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 
 @Document(collection = "users")
+@Validated
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,28 +28,27 @@ public class UserDocument implements UserDetails, CredentialsContainer {
 
     @Id
     private String id;
-    @NonNull
     private String username;
-    @NonNull
     private String password;
-
+    private String email;
+    private String firstName;
+    private String lastName;
     private boolean active;
+    private List<RoleDocument> authorities = new ArrayList<>();
 
-    @NonNull
-    private List<? extends RoleDocument> authorities;
-
-
-    public UserDocument(UserRegistrationRequest userRegistrationRequest) {
-        this.setUserRegistrationRequest(userRegistrationRequest);
+    public UserDocument(UserRegistrationRequest req, RoleDocument defaultRole) {
+        this.authorities.add(defaultRole);
+        setUserRegistrationRequest(req);
     }
 
-    public void setUserRegistrationRequest(UserRegistrationRequest userRegistrationRequest) {
-        if (!StringUtils.isBlank(userRegistrationRequest.getUsername())) {
-            this.username = userRegistrationRequest.getUsername();
-        }
-        if (!StringUtils.isBlank(userRegistrationRequest.getPassword())) {
-            this.password = userRegistrationRequest.getPassword();
-        }
+    public void setUserRegistrationRequest(UserRegistrationRequest req) {
+        this.id = UUID.randomUUID().toString();
+            this.username = req.getUsername();
+            this.password = req.getPassword();
+            this.email = req.getEmail();
+            this.firstName = req.getFirstName();
+            this.lastName = req.getLastName();
+            this.active = true;
     }
 
     @Override

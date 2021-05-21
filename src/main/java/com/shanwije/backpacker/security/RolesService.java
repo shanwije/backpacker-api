@@ -8,8 +8,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-@AllArgsConstructor
+
 @Service
+@AllArgsConstructor
 public class RolesService {
 
     private final RolesRepository rolesRepository;
