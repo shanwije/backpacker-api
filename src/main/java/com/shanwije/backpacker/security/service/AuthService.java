@@ -44,10 +44,11 @@ public class AuthService {
     }
 
     public Mono<TokenAuthenticationResponse> getToken(UserAuthenticationRequest userAuthenticationRequest) {
-        return userRepository.findByUsername(userAuthenticationRequest.getUsername())
-                .map(userDetails ->
-                        new TokenAuthenticationResponse(validateAndGetToken(userAuthenticationRequest, userDetails))
-                );
+        return userRepository
+                .findByUsername(userAuthenticationRequest.getUsername())
+                .map(userDetails -> validateAndGetToken(userAuthenticationRequest, userDetails))
+                .map(token -> new TokenAuthenticationResponse(token))
+                .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid username or password")));
     }
 
     private String validateAndGetToken(UserAuthenticationRequest userAuthenticationRequest, UserDocument userDetails) {
@@ -61,13 +62,11 @@ public class AuthService {
             } else if (!userDetails.isAccountNonExpired()) {
                 throw new AccountExpiredException(
                         "User account has expired");
-            } else {
-                return jwtUtil.generateToken(userDetails);
             }
-
         } else {
-            throw new BadCredentialsException("invalid username or password");
+            throw new BadCredentialsException("Invalid username or password");
         }
+        return jwtUtil.generateToken(userDetails);
     }
 
 }
