@@ -1,5 +1,7 @@
 package com.shanwije.backpacker.controller;
 
+import com.shanwije.backpacker.config.MultiDataResponse;
+import com.shanwije.backpacker.config.SingleDataResponse;
 import com.shanwije.backpacker.security.request.UserRegistrationRequest;
 import com.shanwije.backpacker.security.response.UserResponse;
 import com.shanwije.backpacker.security.service.UsersDetailsService;
@@ -9,42 +11,44 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Log4j2
 @RestController
 @AllArgsConstructor
-@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/users", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 public class UsersController {
 
 
     UsersDetailsService usersDetailsService;
+    MultiDataResponse multiDataResponse;
+    SingleDataResponse singleDataResponse;
 
 
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public Flux<ResponseEntity<UserResponse>> findAll() {
+    public Mono<ResponseEntity<MultiDataResponse>> findAll() {
         return usersDetailsService.findAll()
-                .map(ResponseEntity::ok);
+                .collectList()
+                .map(userResponses -> ResponseEntity.ok(multiDataResponse.setData(userResponses)));
     }
 
-    @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<UserResponse>> findById(@PathVariable String id) {
         return usersDetailsService.findById(id)
-                .map(ResponseEntity::ok)
+                .map(body -> ResponseEntity.ok(body))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @RequestMapping(value = "/users/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<ResponseEntity<Void>> delete(@PathVariable String id) {
         return usersDetailsService.delete(id).map(user -> new ResponseEntity<>(user, HttpStatus.OK))
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @RequestMapping(value = "/users/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Mono<ResponseEntity<UserResponse>> update(@PathVariable String id, @RequestBody UserRegistrationRequest userRequest) {
         userRequest.setPassword(null);
