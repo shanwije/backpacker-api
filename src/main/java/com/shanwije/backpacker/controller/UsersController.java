@@ -16,7 +16,8 @@ import reactor.core.publisher.Mono;
 @RestController
 @AllArgsConstructor
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-public class UserController {
+public class UsersController {
+
 
     UsersDetailsService usersDetailsService;
 
