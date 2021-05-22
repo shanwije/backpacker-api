@@ -1,9 +1,9 @@
 package com.shanwije.backpacker.security.controller;
 
+import com.shanwije.backpacker.config.ResponseWrapper;
 import com.shanwije.backpacker.security.request.UserAuthenticationRequest;
 import com.shanwije.backpacker.security.request.UserRegistrationRequest;
 import com.shanwije.backpacker.security.response.TokenAuthenticationResponse;
-import com.shanwije.backpacker.security.response.UserResponse;
 import com.shanwije.backpacker.security.service.AuthService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -22,18 +22,20 @@ import javax.validation.Valid;
 public class AuthController {
 
     AuthService authService;
+    ResponseWrapper responseWrapper;
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<UserResponse> register(@Valid @RequestBody UserRegistrationRequest userRegistrationRequest) {
-        return authService.register(userRegistrationRequest);
+    public Mono<ResponseEntity<ResponseWrapper>> register(@Valid @RequestBody UserRegistrationRequest userRegistrationRequest) {
+        return authService.register(userRegistrationRequest)
+                .map(userResponse -> ResponseEntity.ok(responseWrapper.setData(userResponse)));
     }
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<TokenAuthenticationResponse>> getToken(@Valid @RequestBody UserAuthenticationRequest userAuthenticationRequest) {
+    public Mono<ResponseEntity<ResponseWrapper>> getToken(@Valid @RequestBody UserAuthenticationRequest userAuthenticationRequest) {
         return authService.getToken(userAuthenticationRequest)
-                .map(ResponseEntity::ok);
+                .map((TokenAuthenticationResponse tokenBody) -> ResponseEntity.ok(responseWrapper.setData(tokenBody)));
     }
 
 }

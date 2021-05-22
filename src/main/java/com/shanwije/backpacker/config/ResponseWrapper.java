@@ -3,7 +3,6 @@ package com.shanwije.backpacker.config;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -11,8 +10,16 @@ import org.springframework.stereotype.Component;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 @Component
-public class SingleDataResponse<T extends Object> {
+public class ResponseWrapper<T extends Object> {
     private T data;
+
+    public T getData() {
+        return data;
+    }
+
+    public ResponseWrapper setData(T data) {
+        this.data = data;
+        return this;
+    }
 }
