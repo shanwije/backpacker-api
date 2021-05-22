@@ -1,4 +1,4 @@
-package com.shanwije.backpacker.security;
+package com.shanwije.backpacker.security.service;
 
 import com.shanwije.backpacker.security.documents.RoleDocument;
 import com.shanwije.backpacker.security.repository.RolesRepository;

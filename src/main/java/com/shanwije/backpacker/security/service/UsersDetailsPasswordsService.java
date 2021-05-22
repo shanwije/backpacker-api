@@ -1,4 +1,4 @@
-package com.shanwije.backpacker.service;
+package com.shanwije.backpacker.security.service;
 
 import com.shanwije.backpacker.security.documents.UserDocument;
 import com.shanwije.backpacker.security.repository.UserRepository;
@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 
 @AllArgsConstructor
 @Service
-public class CustomUsersDetailsPasswordsService implements ReactiveUserDetailsPasswordService {
+public class UsersDetailsPasswordsService implements ReactiveUserDetailsPasswordService {
 
     private final UserRepository userRepository;
 

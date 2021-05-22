@@ -1,90 +1,58 @@
 package com.shanwije.backpacker.controller;
 
-import com.shanwije.backpacker.security.AuthService;
+import com.shanwije.backpacker.security.service.AuthService;
 import com.shanwije.backpacker.security.request.UserAuthenticationRequest;
 import com.shanwije.backpacker.security.request.UserRegistrationRequest;
 import com.shanwije.backpacker.security.response.TokenAuthenticationResponse;
 import com.shanwije.backpacker.security.response.UserResponse;
+import com.shanwije.backpacker.security.service.UsersDetailsService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import javax.validation.Valid;
 
 @Log4j2
 @RestController
 @AllArgsConstructor
-@RequestMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
 
-    //    final UserService userService;
-//    private UserRepository userRepository;
-//    private JWTUtil jwtUtil;
-    AuthService authService;
+    UsersDetailsService usersDetailsService;
 
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
-    public Mono<UserResponse> register(@Valid @RequestBody UserRegistrationRequest userRegistrationRequest) {
-        return authService.register(userRegistrationRequest);
-    }
 
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public Mono<TokenAuthenticationResponse> getToken(@Valid @RequestBody UserAuthenticationRequest userAuthenticationRequest) {
-        return authService.getToken(userAuthenticationRequest);
+    public Flux<ResponseEntity<UserResponse>> findAll() {
+        return usersDetailsService.findAll()
+                .map(users -> ResponseEntity.ok(users));
     }
 
-
-/*    @GetMapping()
-    public Flux<User> getAll() {
-        return userService.findAll();
-    }
-
-    @PostMapping("/token")
-    public Mono<ResponseEntity<?>> login(@RequestBody User user) {
-        return userRepository.findByUsername(user.getUsername()).map((userDetails) -> {
-            if (getPasswordEncoder().matches(user.getPassword(), userDetails.getPassword())) {
-                return ResponseEntity.ok(jwtUtil.generateToken(user));
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-        }).defaultIfEmpty(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
-    }
-
-
-    @GetMapping("/{id}")
-    public Mono<ResponseEntity<User>> getById(@PathVariable(value = "id")String id) {
-        return userService.findById(id)
+    @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<ResponseEntity<UserResponse>> findById(@PathVariable String id) {
+        return usersDetailsService.findById(id)
                 .map(user -> ResponseEntity.ok(user))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public Mono<User> create(@RequestBody User user) {
-        return userService.save(user);
-    }
-
-    @DeleteMapping
-    public Mono<ResponseEntity<User>> deleteById(@PathVariable(value = "id")String id) {
-        return userService.delete(id).map(user -> new ResponseEntity<>(user, HttpStatus.OK))
+    @RequestMapping(value = "/users/{id}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Mono<ResponseEntity<Void>> delete(@PathVariable String id) {
+        return usersDetailsService.delete(id).map(user -> new ResponseEntity<>(user, HttpStatus.OK))
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PutMapping
-    public Mono<ResponseEntity<User>> updateUser(@PathVariable(value = "id")String id,
-                                      @RequestBody User user) {
-        return userService.findById(id)
-                .flatMap(user1 -> {
-                    user1.setUsername(user.getUsername());
-                    user1.setPassword(user.getPassword());
-                    user1.setRoles(user.getRoles());
-                    return userService.save(user1);
-                })
+    @RequestMapping(value = "/users/{id}", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Mono<ResponseEntity<UserResponse>> update(@PathVariable String id, @RequestBody UserRegistrationRequest userRequest) {
+        userRequest.setPassword(null);
+        return usersDetailsService.findById(id)
+                .flatMap(user1 -> usersDetailsService.update(user1.getId(), userRequest))
                 .map(updatedUser -> new ResponseEntity<>(updatedUser, HttpStatus.OK))
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }*/
+    }
 }

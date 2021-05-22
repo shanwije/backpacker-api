@@ -1,4 +1,4 @@
-package com.shanwije.backpacker.service;
+package com.shanwije.backpacker.security.service;
 
 import com.shanwije.backpacker.security.repository.UserRepository;
 import com.shanwije.backpacker.security.request.UserRegistrationRequest;
@@ -15,7 +15,7 @@ import java.util.Objects;
 
 @AllArgsConstructor
 @Service
-public class CustomUsersDetailsService implements ReactiveUserDetailsService {
+public class UsersDetailsService implements ReactiveUserDetailsService {
 
     private final UserRepository userRepository;
 

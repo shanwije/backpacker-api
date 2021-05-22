@@ -44,8 +44,8 @@ public class SecurityConfiguration {
                                     .pathMatchers("/swagger-ui/**").permitAll()
                                     .pathMatchers("/v2/api-docs").permitAll()
                                     .pathMatchers("/roles").permitAll()
-                                    .pathMatchers("/user/register").permitAll()
-                                    .pathMatchers("/user/authenticate").permitAll()
+                                    .pathMatchers("/register").permitAll()
+                                    .pathMatchers("/authenticate").permitAll()
                                     .pathMatchers("/**").authenticated();
                         }
                 ).exceptionHandling()

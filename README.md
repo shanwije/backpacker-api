@@ -1,1 +1,3 @@
-backpacker
+#Backpacker
+
+###springdoc.swagger-ui.path=/swagger-ui.html

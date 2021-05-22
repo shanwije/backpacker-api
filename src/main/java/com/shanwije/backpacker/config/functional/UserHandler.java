@@ -2,7 +2,7 @@
 package com.shanwije.backpacker.config.functional;
 
 import com.shanwije.backpacker.entities.User;
-import com.shanwije.backpacker.service.UserService;
+import com.shanwije.backpacker.security.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;

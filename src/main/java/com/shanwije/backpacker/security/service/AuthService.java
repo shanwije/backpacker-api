@@ -1,8 +1,7 @@
-package com.shanwije.backpacker.security;
+package com.shanwije.backpacker.security.service;
 
 import com.shanwije.backpacker.security.config.AuthenticationManager;
 import com.shanwije.backpacker.security.config.JWTUtil;
-import com.shanwije.backpacker.security.documents.RoleDocument;
 import com.shanwije.backpacker.security.documents.UserDocument;
 import com.shanwije.backpacker.security.repository.RolesRepository;
 import com.shanwije.backpacker.security.repository.UserRepository;
