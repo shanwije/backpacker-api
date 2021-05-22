@@ -32,11 +32,11 @@ public class AuthService {
     public Mono<UserResponse> register(UserRegistrationRequest userRegistrationRequest) {
 
         return userRepository.findByUsername(userRegistrationRequest.getUsername())
-                .flatMap(__ -> Mono.error(new BadCredentialsException(userRegistrationRequest.getUsername() + " : username already exist")))
+                .flatMap(existingUser -> Mono.error(new BadCredentialsException(userRegistrationRequest.getUsername() + " : username already exist")))
                 .switchIfEmpty(Mono.defer(() -> {
                     userRegistrationRequest.setPassword(passwordEncoder.encode(userRegistrationRequest.getPassword()));
                     return rolesRepository.findByAuthority("ROLE_USER").flatMap(defaultRole -> {
-                        UserDocument userDocument = new UserDocument(userRegistrationRequest, defaultRole);
+                        var userDocument = new UserDocument(userRegistrationRequest, defaultRole);
                         return userRepository.save(userDocument).flatMap(userDocument1 ->
                                 Mono.just(new UserResponse(userDocument1)));
                     });
@@ -45,7 +45,7 @@ public class AuthService {
 
     public Mono<TokenAuthenticationResponse> getToken(UserAuthenticationRequest userAuthenticationRequest) {
         return userRepository.findByUsername(userAuthenticationRequest.getUsername())
-                .map((userDetails) ->
+                .map(userDetails ->
                         new TokenAuthenticationResponse(validateAndGetToken(userAuthenticationRequest, userDetails))
                 );
     }

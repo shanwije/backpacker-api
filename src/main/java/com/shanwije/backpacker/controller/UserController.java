@@ -1,9 +1,6 @@
 package com.shanwije.backpacker.controller;
 
-import com.shanwije.backpacker.security.service.AuthService;
-import com.shanwije.backpacker.security.request.UserAuthenticationRequest;
 import com.shanwije.backpacker.security.request.UserRegistrationRequest;
-import com.shanwije.backpacker.security.response.TokenAuthenticationResponse;
 import com.shanwije.backpacker.security.response.UserResponse;
 import com.shanwije.backpacker.security.service.UsersDetailsService;
 import lombok.AllArgsConstructor;
@@ -28,14 +25,14 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public Flux<ResponseEntity<UserResponse>> findAll() {
         return usersDetailsService.findAll()
-                .map(users -> ResponseEntity.ok(users));
+                .map(ResponseEntity::ok);
     }
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<UserResponse>> findById(@PathVariable String id) {
         return usersDetailsService.findById(id)
-                .map(user -> ResponseEntity.ok(user))
+                .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 

@@ -13,6 +13,6 @@ public class DatabaseInitializer implements ApplicationListener<ApplicationReady
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
-        System.out.println("hello world");
+        log.info("Application is ready");
     }
 }

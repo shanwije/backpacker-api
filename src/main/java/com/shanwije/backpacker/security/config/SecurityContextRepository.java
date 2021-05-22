@@ -28,7 +28,7 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 
     @Override
     public Mono<SecurityContext> load(ServerWebExchange serverWebExchange) {
-        String bearer = "Bearer ";
+        var bearer = "Bearer ";
         return Mono.justOrEmpty(serverWebExchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
                 .filter(b -> b.startsWith(bearer))
                 .map(subs -> subs.substring(bearer.length()))

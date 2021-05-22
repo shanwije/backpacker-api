@@ -39,12 +39,12 @@ public class UserDocument implements UserDetails, CredentialsContainer {
 
     public void setUserRegistrationRequest(UserRegistrationRequest req) {
         this.id = UUID.randomUUID().toString();
-            this.username = req.getUsername();
-            this.password = req.getPassword();
-            this.email = req.getEmail();
-            this.firstName = req.getFirstName();
-            this.lastName = req.getLastName();
-            this.active = true;
+        this.username = req.getUsername();
+        this.password = req.getPassword();
+        this.email = req.getEmail();
+        this.firstName = req.getFirstName();
+        this.lastName = req.getLastName();
+        this.active = true;
     }
 
     @Override
@@ -55,20 +55,20 @@ public class UserDocument implements UserDetails, CredentialsContainer {
     @Override
     public boolean isAccountNonExpired() {
         return active;
-    }
+    } //NOSONAR
 
     @Override
     public boolean isAccountNonLocked() {
         return active;
-    }
+    } //NOSONAR
 
     @Override
     public boolean isCredentialsNonExpired() {
         return active;
-    }
+    } //NOSONAR
 
     @Override
     public boolean isEnabled() {
         return active;
-    }
+    } //NOSONAR
 }

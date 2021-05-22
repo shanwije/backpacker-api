@@ -33,7 +33,7 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<TokenAuthenticationResponse>> getToken(@Valid @RequestBody UserAuthenticationRequest userAuthenticationRequest) {
         return authService.getToken(userAuthenticationRequest)
-                .map(users -> ResponseEntity.ok(users));
+                .map(ResponseEntity::ok);
     }
 
 }

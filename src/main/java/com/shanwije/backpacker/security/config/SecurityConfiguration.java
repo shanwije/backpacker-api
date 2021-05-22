@@ -33,28 +33,27 @@ public class SecurityConfiguration {
     public SecurityWebFilterChain filterChain(ServerHttpSecurity http) {
         return http
                 .authorizeExchange(
-                        authorizeExchangeSpec -> {
-                            authorizeExchangeSpec
-                                    .pathMatchers("/").permitAll()
-                                    .pathMatchers("/version").permitAll()
-                                    .pathMatchers("/health").permitAll()
-                                    .pathMatchers("/health/**").permitAll()
-                                    .pathMatchers("/actuator/**").permitAll()
-                                    .pathMatchers("/swagger-resources/**").permitAll()
-                                    .pathMatchers("/swagger-ui/**").permitAll()
-                                    .pathMatchers("/v2/api-docs").permitAll()
-                                    .pathMatchers("/roles").permitAll()
-                                    .pathMatchers("/register").permitAll()
-                                    .pathMatchers("/authenticate").permitAll()
-                                    .pathMatchers("/**").authenticated();
-                        }
+                        authorizeExchangeSpec -> authorizeExchangeSpec
+                                .pathMatchers("/").permitAll()
+                                .pathMatchers("/version").permitAll()
+                                .pathMatchers("/health").permitAll()
+                                .pathMatchers("/health/**").permitAll()
+                                .pathMatchers("/actuator/**").permitAll()
+                                .pathMatchers("/swagger-resources/**").permitAll()
+                                .pathMatchers("/swagger-ui/**").permitAll()
+                                .pathMatchers("/v2/api-docs").permitAll()
+                                .pathMatchers("/roles").permitAll()
+                                .pathMatchers("/register").permitAll()
+                                .pathMatchers("/authenticate").permitAll()
+                                .pathMatchers("/**").authenticated()
                 ).exceptionHandling()
                 .accessDeniedHandler(new HttpStatusServerAccessDeniedHandler(HttpStatus.BAD_REQUEST))
-                .authenticationEntryPoint((res, err) -> Mono.fromRunnable(() -> {
-                    res.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                })).accessDeniedHandler((res, err) -> Mono.fromRunnable(() -> {
-                    res.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-                })).and()
+                .authenticationEntryPoint((res, err) ->
+                        Mono.fromRunnable(() -> res.getResponse()
+                                .setStatusCode(HttpStatus.UNAUTHORIZED)))
+                .accessDeniedHandler((res, err) -> Mono.fromRunnable(() -> res.getResponse()
+                        .setStatusCode(HttpStatus.FORBIDDEN)))
+                .and()
                 .httpBasic().disable()
                 .formLogin().disable()
                 .csrf().disable()

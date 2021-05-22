@@ -38,8 +38,7 @@ public class UsersDetailsService implements ReactiveUserDetailsService {
     }
 
     public Mono<Void> delete(String id) {
-        return userRepository.findById(id).flatMap(userDocument ->
-                userRepository.delete(userDocument));
+        return userRepository.findById(id).flatMap(userRepository::delete);
     }
 
     public Mono<UserResponse> update(String id, UserRegistrationRequest userRequest) {

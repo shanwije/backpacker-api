@@ -17,7 +17,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
-        String token = authentication.getCredentials().toString();
+        var token = authentication.getCredentials().toString();
         String username = jwtUtil.getUsernameFromToken(token);
 
         return userRepository.findByUsername(username)

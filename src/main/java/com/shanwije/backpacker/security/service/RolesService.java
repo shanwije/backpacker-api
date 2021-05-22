@@ -16,14 +16,10 @@ public class RolesService {
     private final RolesRepository rolesRepository;
 
     public Mono<RoleResponse> create(RoleRequest request) {
-        return rolesRepository.save(new RoleDocument(request.getAuthority())).flatMap(roleDocument -> {
-            return Mono.just(new RoleResponse(roleDocument));
-        });
+        return rolesRepository.save(new RoleDocument(request.getAuthority())).flatMap(roleDocument -> Mono.just(new RoleResponse(roleDocument)));
     }
 
     public Mono<Void> delete(String id) {
-        return rolesRepository.findById(id).flatMap(roleDocument -> {
-            return rolesRepository.delete(roleDocument);
-        });
+        return rolesRepository.findById(id).flatMap(rolesRepository::delete);
     }
 }

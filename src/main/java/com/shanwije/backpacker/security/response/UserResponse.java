@@ -1,6 +1,7 @@
 package com.shanwije.backpacker.security.response;
 
 
+import com.shanwije.backpacker.security.documents.RoleDocument;
 import com.shanwije.backpacker.security.documents.UserDocument;
 import lombok.Data;
 
@@ -23,6 +24,6 @@ public class UserResponse {
         this.firstName = ud.getFirstName();
         this.lastName = ud.getLastName();
         this.authorities = ud.getAuthorities().stream()
-                .map(roleDocument -> roleDocument.getAuthority()).collect(Collectors.toList());
+                .map(RoleDocument::getAuthority).collect(Collectors.toList());
     }
 }

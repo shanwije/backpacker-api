@@ -8,6 +8,9 @@ public class CustomPasswordEncoder {
 
     private static final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
+    private CustomPasswordEncoder() {
+    }
+
     public static BCryptPasswordEncoder getPasswordEncoder() {
         return bCryptPasswordEncoder;
     }
