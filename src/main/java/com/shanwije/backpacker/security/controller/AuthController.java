@@ -22,7 +22,7 @@ import javax.validation.Valid;
 public class AuthController {
 
     AuthService authService;
-    ResponseWrapper responseWrapper;
+    ResponseWrapper<Object> responseWrapper;
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)

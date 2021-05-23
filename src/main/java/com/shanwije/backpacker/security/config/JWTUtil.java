@@ -17,11 +17,10 @@ import java.util.stream.Collectors;
 @Component
 public class JWTUtil {
 
+    private static final String AUTHORITIES_KEY = "auth";
     @Value("${jjwt.expiration}")
     private String expireTimeInMilliSec;
     private Key key;
-
-    private static final String AUTHORITIES_KEY = "auth";
 
     @PostConstruct
     public void init() {

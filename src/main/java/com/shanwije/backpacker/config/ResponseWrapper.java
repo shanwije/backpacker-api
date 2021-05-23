@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @NoArgsConstructor
 @Component
-public class ResponseWrapper<T extends Object> {
+public class ResponseWrapper<T> {
     private T data;
 
     public T getData() {

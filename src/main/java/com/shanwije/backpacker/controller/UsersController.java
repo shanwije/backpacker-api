@@ -1,6 +1,5 @@
 package com.shanwije.backpacker.controller;
 
-import com.shanwije.backpacker.config.MultiDataResponse;
 import com.shanwije.backpacker.config.ResponseWrapper;
 import com.shanwije.backpacker.security.request.UserRegistrationRequest;
 import com.shanwije.backpacker.security.service.UsersDetailsService;
@@ -15,12 +14,12 @@ import reactor.core.publisher.Mono;
 @Log4j2
 @RestController
 @AllArgsConstructor
-@RequestMapping(value = "/users", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UsersController {
 
 
     UsersDetailsService usersDetailsService;
-    ResponseWrapper responseWrapper;
+    ResponseWrapper<Object> responseWrapper;
 
 
     @GetMapping()

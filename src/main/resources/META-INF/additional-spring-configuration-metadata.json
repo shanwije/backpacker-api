@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "jjwt.expiration",
+      "type": "java.lang.String",
+      "description": "Expiration duration in millis for the JWT token."
+  }
+] }

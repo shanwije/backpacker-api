@@ -47,7 +47,7 @@ public class AuthService {
         return userRepository
                 .findByUsername(userAuthenticationRequest.getUsername())
                 .map(userDetails -> validateAndGetToken(userAuthenticationRequest, userDetails))
-                .map(token -> new TokenAuthenticationResponse(token))
+                .map(TokenAuthenticationResponse::new)
                 .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid username or password")));
     }
 

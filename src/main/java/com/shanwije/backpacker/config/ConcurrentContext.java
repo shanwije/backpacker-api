@@ -1,7 +1,5 @@
 package com.shanwije.backpacker.config;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
