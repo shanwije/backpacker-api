@@ -1,4 +1,3 @@
-/*
 package com.shanwije.backpacker.security.authority;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,7 +9,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize(value = "hasAuthority('ROLE_ADMIN')") //OR @PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize(value = "hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')") //OR @PreAuthorize("hasRole('ADMIN')")
 public @interface IsAdmin {
 }
-*/

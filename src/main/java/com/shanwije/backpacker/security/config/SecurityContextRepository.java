@@ -1,7 +1,9 @@
 package com.shanwije.backpacker.security.config;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
@@ -23,8 +25,24 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 
     @Override
     public Mono<Void> save(ServerWebExchange serverWebExchange, SecurityContext securityContext) {
-        return Mono.empty();
+        throw new UnsupportedOperationException("Not supported yet.");
     }
+
+//    @Override
+//    public Mono<SecurityContext> load(ServerWebExchange swe) {
+//        ServerHttpRequest request = swe.getRequest();
+//        String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+//
+//        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+//            String authToken = authHeader.substring(7);
+//            Authentication auth = new UsernamePasswordAuthenticationToken(authToken, authToken);
+//            return this.authenticationManager.authenticate(auth).map((authentication) -> {
+//                return new SecurityContextImpl(authentication);
+//            });
+//        } else {
+//            return Mono.empty();
+//        }
+//    }
 
     @Override
     public Mono<SecurityContext> load(ServerWebExchange serverWebExchange) {
@@ -33,8 +51,10 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
                 .filter(b -> b.startsWith(bearer))
                 .map(subs -> subs.substring(bearer.length()))
                 .flatMap(token -> Mono.just(new UsernamePasswordAuthenticationToken(
-                        token, token, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")))))
-                .flatMap(auth -> authenticationManager.authenticate(auth).map(SecurityContextImpl::new));
+                        token, token)))
+                .flatMap(auth -> {
+                    return authenticationManager.authenticate(auth).map(authentication -> new SecurityContextImpl(authentication));
+                });
     }
 
 }
