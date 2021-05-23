@@ -1,5 +1,6 @@
 package com.shanwije.backpacker.config.core;
 
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
@@ -53,7 +54,10 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
         var exception = errorStringObjectMap.get("exception").toString();
 
         if (AuthenticationCredentialsNotFoundException.class.getName().equals(exception)
+
                 || SignatureException.class.getName().equals(exception)
+                || MalformedJwtException.class.getName().equals(exception)
+
                 || BadCredentialsException.class.getName().equals(exception)
                 || DisabledException.class.getName().equals(exception)
                 || LockedException.class.getName().equals(exception)
