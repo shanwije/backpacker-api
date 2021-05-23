@@ -3,7 +3,7 @@ package com.shanwije.backpacker.security.controller;
 import com.shanwije.backpacker.config.core.ResponseWrapper;
 import com.shanwije.backpacker.security.request.UserAuthenticationRequest;
 import com.shanwije.backpacker.security.request.UserRegistrationRequest;
-import com.shanwije.backpacker.security.response.TokenAuthenticationResponse;
+import com.shanwije.backpacker.security.response.JwtTokenResponse;
 import com.shanwije.backpacker.security.service.AuthService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -27,15 +27,15 @@ public class AuthController {
     @RequestMapping(value = "/sign-up", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<ResponseEntity<ResponseWrapper>> signUp(@Valid @RequestBody UserRegistrationRequest userRegistrationRequest) {
-        return authService.register(userRegistrationRequest)
+        return authService.signUp(userRegistrationRequest)
                 .map(userResponse -> ResponseEntity.ok(responseWrapper.setData(userResponse)));
     }
 
     @RequestMapping(value = "/sign-in", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<ResponseWrapper>> signIn(@Valid @RequestBody UserAuthenticationRequest userAuthenticationRequest) {
-        return authService.getToken(userAuthenticationRequest)
-                .map((TokenAuthenticationResponse tokenBody) -> ResponseEntity.ok(responseWrapper.setData(tokenBody)));
+        return authService.signIn(userAuthenticationRequest)
+                .map((JwtTokenResponse tokenBody) -> ResponseEntity.ok(responseWrapper.setData(tokenBody)));
     }
 
 }

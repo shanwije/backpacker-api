@@ -1,5 +1,6 @@
 package com.shanwije.backpacker.security.service;
 
+import com.shanwije.backpacker.security.Validation;
 import com.shanwije.backpacker.security.config.AuthenticationManager;
 import com.shanwije.backpacker.security.config.JWTUtil;
 import com.shanwije.backpacker.security.documents.UserDocument;
@@ -7,13 +8,10 @@ import com.shanwije.backpacker.security.repository.RolesRepository;
 import com.shanwije.backpacker.security.repository.UserRepository;
 import com.shanwije.backpacker.security.request.UserAuthenticationRequest;
 import com.shanwije.backpacker.security.request.UserRegistrationRequest;
-import com.shanwije.backpacker.security.response.TokenAuthenticationResponse;
+import com.shanwije.backpacker.security.response.JwtTokenResponse;
 import com.shanwije.backpacker.security.response.UserResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -29,7 +27,7 @@ public class AuthService {
     AuthenticationManager authenticationManager;
     JWTUtil jwtUtil;
 
-    public Mono<UserResponse> register(UserRegistrationRequest userRegistrationRequest) {
+    public Mono<UserResponse> signUp(UserRegistrationRequest userRegistrationRequest) {
 
         return userRepository.findByUsername(userRegistrationRequest.getUsername())
                 .flatMap(existingUser -> Mono.error(new BadCredentialsException(userRegistrationRequest.getUsername() + " : username already exist")))
@@ -43,30 +41,19 @@ public class AuthService {
                 })).cast(UserResponse.class);
     }
 
-    public Mono<TokenAuthenticationResponse> getToken(UserAuthenticationRequest userAuthenticationRequest) {
+    public Mono<JwtTokenResponse> signIn(UserAuthenticationRequest userAuthenticationRequest) {
         return userRepository
                 .findByUsername(userAuthenticationRequest.getUsername())
-                .map(userDetails -> validateAndGetToken(userAuthenticationRequest, userDetails))
-                .map(TokenAuthenticationResponse::new)
+                .map(userDetails -> authenticateAndValidateUser(userAuthenticationRequest, userDetails))
+                .map(jwtUtil::getJwtTokenResponse)
                 .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid username or password")));
     }
 
-    private String validateAndGetToken(UserAuthenticationRequest userAuthenticationRequest, UserDocument userDetails) {
-        if (passwordEncoder.matches(userAuthenticationRequest.getPassword(), userDetails.getPassword())) {
-            if (!userDetails.isEnabled()) {
-                throw new DisabledException(
-                        "User is disabled");
-            } else if (!userDetails.isAccountNonLocked()) {
-                throw new LockedException(
-                        "User account is locked");
-            } else if (!userDetails.isAccountNonExpired()) {
-                throw new AccountExpiredException(
-                        "User account has expired");
-            }
-        } else {
-            throw new BadCredentialsException("Invalid username or password");
-        }
-        return jwtUtil.generateToken(userDetails);
+    private UserDocument authenticateAndValidateUser(UserAuthenticationRequest userAuthenticationRequest, UserDocument userDetails) {
+        Validation.validatePassword(passwordEncoder, userAuthenticationRequest, userDetails);
+        Validation.validateAccount(userDetails);
+        return userDetails;
     }
+
 
 }

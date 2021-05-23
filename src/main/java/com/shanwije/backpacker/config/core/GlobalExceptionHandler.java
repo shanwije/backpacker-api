@@ -1,5 +1,6 @@
 package com.shanwije.backpacker.config.core;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.log4j.Log4j2;
@@ -62,9 +63,11 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
                 || DisabledException.class.getName().equals(exception)
                 || LockedException.class.getName().equals(exception)
                 || AccountExpiredException.class.getName().equals(exception)) {
-            status = HttpStatus.UNAUTHORIZED.value();
+            status = HttpStatus.BAD_REQUEST.value();
         } else if (AccessDeniedException.class.getName().equals(exception)) {
             status = HttpStatus.FORBIDDEN.value();
+        } else if (ExpiredJwtException.class.getName().equals(exception)) {
+            status = HttpStatus.UNAUTHORIZED.value();
         }
 
         log.error("Error {}", errorStringObjectMap);

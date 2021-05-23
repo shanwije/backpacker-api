@@ -1,5 +1,6 @@
 package com.shanwije.backpacker.security.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,10 +14,15 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class SecurityContextRepository implements ServerSecurityContextRepository {
 
+
+    @Value("${jjwt.token.type}")
+    private String tokenType;
     private final AuthenticationManager authenticationManager;
 
     public SecurityContextRepository(AuthenticationManager authenticationManager) {
@@ -28,28 +34,11 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-//    @Override
-//    public Mono<SecurityContext> load(ServerWebExchange swe) {
-//        ServerHttpRequest request = swe.getRequest();
-//        String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-//
-//        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-//            String authToken = authHeader.substring(7);
-//            Authentication auth = new UsernamePasswordAuthenticationToken(authToken, authToken);
-//            return this.authenticationManager.authenticate(auth).map((authentication) -> {
-//                return new SecurityContextImpl(authentication);
-//            });
-//        } else {
-//            return Mono.empty();
-//        }
-//    }
-
     @Override
     public Mono<SecurityContext> load(ServerWebExchange serverWebExchange) {
-        var bearer = "Bearer ";
         return Mono.justOrEmpty(serverWebExchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
-                .filter(b -> b.startsWith(bearer))
-                .map(subs -> subs.substring(bearer.length()))
+                .filter(b -> b.startsWith(tokenType))
+                .map(subs -> subs.substring(tokenType.length()))
                 .flatMap(token -> Mono.just(new UsernamePasswordAuthenticationToken(
                         token, token)))
                 .flatMap(auth -> {
