@@ -28,6 +28,9 @@ public class LogFilter implements WebFilter {
 
         var correlationId = UUID.randomUUID().toString();
 
+        var req = serverWebExchange.getRequest();
+
+        log.info("Request recieved, path: {}, Http method : {}, Headers : {}, Body: {}",req.getPath(), req.getMethod(), req.getHeaders(), req.getBody());
         log.info("setting co-relation ID: {}", correlationId);
         ConcurrentContext.put(CORRELATION_ID_KEY, correlationId);
 

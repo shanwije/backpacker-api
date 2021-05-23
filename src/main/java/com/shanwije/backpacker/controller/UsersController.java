@@ -8,6 +8,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -21,7 +22,7 @@ public class UsersController {
     UsersDetailsService usersDetailsService;
     ResponseWrapper<Object> responseWrapper;
 
-
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<ResponseWrapper>> findAll() {
@@ -30,6 +31,7 @@ public class UsersController {
                 .map(userResponses -> ResponseEntity.ok(responseWrapper.setData(userResponses)));
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<ResponseWrapper>> findById(@PathVariable String id) {
@@ -38,6 +40,7 @@ public class UsersController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
+
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<ResponseWrapper>> delete(@PathVariable String id) {
@@ -45,6 +48,7 @@ public class UsersController {
                 .map(userResponses -> ResponseEntity.ok(responseWrapper.setData(userResponses)))
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.ACCEPTED)
