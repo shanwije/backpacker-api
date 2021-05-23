@@ -1,4 +1,4 @@
-package com.shanwije.backpacker.config;
+package com.shanwije.backpacker.config.core;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

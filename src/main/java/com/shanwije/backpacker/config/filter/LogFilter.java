@@ -1,5 +1,6 @@
-package com.shanwije.backpacker.config;
+package com.shanwije.backpacker.config.filter;
 
+import com.shanwije.backpacker.config.core.ConcurrentContext;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
 package com.shanwije.backpacker.security.controller;
 
-import com.shanwije.backpacker.config.ResponseWrapper;
+import com.shanwije.backpacker.config.core.ResponseWrapper;
 import com.shanwije.backpacker.security.request.UserAuthenticationRequest;
 import com.shanwije.backpacker.security.request.UserRegistrationRequest;
 import com.shanwije.backpacker.security.response.TokenAuthenticationResponse;
@@ -18,22 +18,22 @@ import javax.validation.Valid;
 @Log4j2
 @RestController
 @AllArgsConstructor
-@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value="/auth", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AuthController {
 
     AuthService authService;
     ResponseWrapper<Object> responseWrapper;
 
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    @RequestMapping(value = "/sign-up", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<ResponseEntity<ResponseWrapper>> register(@Valid @RequestBody UserRegistrationRequest userRegistrationRequest) {
+    public Mono<ResponseEntity<ResponseWrapper>> signUp(@Valid @RequestBody UserRegistrationRequest userRegistrationRequest) {
         return authService.register(userRegistrationRequest)
                 .map(userResponse -> ResponseEntity.ok(responseWrapper.setData(userResponse)));
     }
 
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @RequestMapping(value = "/sign-in", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public Mono<ResponseEntity<ResponseWrapper>> getToken(@Valid @RequestBody UserAuthenticationRequest userAuthenticationRequest) {
+    public Mono<ResponseEntity<ResponseWrapper>> signIn(@Valid @RequestBody UserAuthenticationRequest userAuthenticationRequest) {
         return authService.getToken(userAuthenticationRequest)
                 .map((TokenAuthenticationResponse tokenBody) -> ResponseEntity.ok(responseWrapper.setData(tokenBody)));
     }

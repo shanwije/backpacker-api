@@ -1,8 +1,6 @@
 package com.shanwije.backpacker.config.core;
 
-import com.shanwije.backpacker.config.ResponseWrapper;
-import org.springframework.boot.autoconfigure.web.ResourceProperties;
-import org.springframework.boot.autoconfigure.web.WebProperties;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
@@ -11,6 +9,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.*;
@@ -23,6 +23,7 @@ import static org.springframework.boot.autoconfigure.web.WebProperties.Resources
 
 
 @Component
+@Log4j2
 @Order(-2)
 public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
 
@@ -40,8 +41,34 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
     }
 
     private Mono<ServerResponse> formatErrorResponse(ServerRequest request) {
-        var errorStringObjectMap = getErrorAttributes(request, ErrorAttributeOptions.of(ErrorAttributeOptions.Include.MESSAGE));
-        var status = ((int) Optional.ofNullable(errorStringObjectMap.get("status")).orElse(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        Map<String, Object> errorStringObjectMap =
+                getErrorAttributes(request, ErrorAttributeOptions
+                        .of(ErrorAttributeOptions.Include.EXCEPTION)
+                        .including(ErrorAttributeOptions.Include.MESSAGE)
+                        .including(ErrorAttributeOptions.Include.STACK_TRACE)
+                );
+        int status = ((int) Optional.ofNullable(errorStringObjectMap.get("status")).orElse(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+
+        var exception = errorStringObjectMap.get("exception").toString();
+
+        if (AuthenticationCredentialsNotFoundException.class.getName().equals(exception)
+                || BadCredentialsException.class.getName().equals(exception)
+                || DisabledException.class.getName().equals(exception)
+                || LockedException.class.getName().equals(exception)
+                || AccountExpiredException.class.getName().equals(exception)) {
+            status = HttpStatus.UNAUTHORIZED.value();
+        } else if (AccessDeniedException.class.getName().equals(exception)) {
+            status = HttpStatus.FORBIDDEN.value();
+        }
+
+        log.error("Error {}", errorStringObjectMap);
+
+        errorStringObjectMap.remove("exception");
+        errorStringObjectMap.remove("status");
+        errorStringObjectMap.remove("error");
+        errorStringObjectMap.remove("error");
+        errorStringObjectMap.remove("trace");
+
         return ServerResponse
                 .status(status)
                 .contentType(MediaType.APPLICATION_JSON)

@@ -43,19 +43,13 @@ public class SecurityConfiguration {
                                 .pathMatchers("/swagger-resources/**").permitAll()
                                 .pathMatchers("/swagger-ui/**").permitAll()
                                 .pathMatchers("/v2/api-docs").permitAll()
-                                .pathMatchers("/roles").permitAll()
-                                .pathMatchers("/register").permitAll()
-                                .pathMatchers("/authenticate").permitAll()
+                                .pathMatchers("/roles").permitAll() // TODO: 5/23/21 remove roles from permitted paths
+                                .pathMatchers("/auth/**").permitAll()
                                 .pathMatchers("/**").authenticated()
                 ).exceptionHandling()
-                .accessDeniedHandler(new HttpStatusServerAccessDeniedHandler(HttpStatus.BAD_REQUEST))
-                .authenticationEntryPoint((res, err) ->
-                        Mono.fromRunnable(() ->
-                                res.getResponse()
-                                        .setStatusCode(HttpStatus.UNAUTHORIZED)))
-                .accessDeniedHandler((res, err) -> Mono.fromRunnable(() ->
-                        res.getResponse()
-                                .setStatusCode(HttpStatus.FORBIDDEN)))
+//                .accessDeniedHandler(new HttpStatusServerAccessDeniedHandler(HttpStatus.BAD_REQUEST))
+                .authenticationEntryPoint((exchange, exception) -> Mono.error(exception))
+                .accessDeniedHandler((res, err) -> Mono.error(err))
                 .and()
                 .httpBasic().disable()
                 .formLogin().disable()

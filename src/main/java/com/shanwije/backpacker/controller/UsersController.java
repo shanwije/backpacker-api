@@ -1,6 +1,6 @@
 package com.shanwije.backpacker.controller;
 
-import com.shanwije.backpacker.config.ResponseWrapper;
+import com.shanwije.backpacker.config.core.ResponseWrapper;
 import com.shanwije.backpacker.security.request.UserRegistrationRequest;
 import com.shanwije.backpacker.security.service.UsersDetailsService;
 import lombok.AllArgsConstructor;

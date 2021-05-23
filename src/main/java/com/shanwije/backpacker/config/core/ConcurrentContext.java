@@ -1,4 +1,4 @@
-package com.shanwije.backpacker.config;
+package com.shanwije.backpacker.config.core;
 
 import lombok.NonNull;
 import org.springframework.stereotype.Component;

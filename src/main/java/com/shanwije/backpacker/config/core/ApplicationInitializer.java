@@ -1,4 +1,4 @@
-package com.shanwije.backpacker.config;
+package com.shanwije.backpacker.config.core;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @AllArgsConstructor
 @Log4j2
-public class DatabaseInitializer implements ApplicationListener<ApplicationReadyEvent> {
+public class ApplicationInitializer implements ApplicationListener<ApplicationReadyEvent> {
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
