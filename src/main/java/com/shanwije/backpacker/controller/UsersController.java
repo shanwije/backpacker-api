@@ -2,7 +2,7 @@ package com.shanwije.backpacker.controller;
 
 import com.shanwije.backpacker.config.core.ResponseWrapper;
 import com.shanwije.backpacker.security.authority.IsAdmin;
-import com.shanwije.backpacker.security.authority.IsUser;
+import com.shanwije.backpacker.security.authority.IsAUthorizedUser;
 import com.shanwije.backpacker.security.request.SignUpRequest;
 import com.shanwije.backpacker.security.service.UsersDetailsService;
 import lombok.AllArgsConstructor;
@@ -32,7 +32,7 @@ public class UsersController {
                 .map(userResponses -> ResponseEntity.ok(responseWrapper.setData(userResponses)));
     }
 
-    @IsUser
+    @IsAUthorizedUser
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<ResponseWrapper>> findById(@PathVariable String id) {
@@ -42,7 +42,7 @@ public class UsersController {
     }
 
 
-    @IsUser
+    @IsAUthorizedUser
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     public Mono<ResponseEntity<ResponseWrapper>> delete(@PathVariable String id) {
@@ -52,7 +52,7 @@ public class UsersController {
     }
 
 
-    @IsUser
+    @IsAUthorizedUser
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Mono<ResponseEntity<ResponseWrapper>> update(@PathVariable String id, @RequestBody SignUpRequest userRequest) {

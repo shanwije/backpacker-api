@@ -38,13 +38,14 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
                 .filter(Objects::nonNull)
                 .switchIfEmpty(Mono.error(new UsernameNotFoundException("Token associated User Account not found")))
                 .cast(UserDocument.class)
-                .map(userDetails -> {
-                    if (validateAccount(userDetails)) {
-                        List<SimpleGrantedAuthority> authorities = userDetails.getAuthorities()
+                .map(document -> {
+                    if (validateAccount(document)) {
+                        List<SimpleGrantedAuthority> authorities = document.getAuthorities()
                                 .stream().map((RoleDocument role) -> new SimpleGrantedAuthority(role.getAuthority()))
                                 .collect(Collectors.toList());
+                        authorities.add(new SimpleGrantedAuthority(document.getId()));
                         return new UsernamePasswordAuthenticationToken(
-                                username, null, authorities);
+                                document.getId(), null, authorities);
                     }
                     return null;
                 });
