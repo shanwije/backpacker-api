@@ -38,10 +38,16 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
     public Mono<SecurityContext> load(ServerWebExchange serverWebExchange) {
         return Mono.justOrEmpty(serverWebExchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
                 .filter(b -> b.startsWith(tokenType))
-                .map(subs -> subs.substring(tokenType.length()))
-                .flatMap(token -> Mono.just(new UsernamePasswordAuthenticationToken(token, token)))
+                .map(subs -> {
+                    var x =  subs.substring(tokenType.length());
+                    return x;
+                })
+                .flatMap(token -> Mono
+                        .just(new UsernamePasswordAuthenticationToken(token, token)))
                 .flatMap(auth -> {
-                    return authenticationManager.authenticate(auth).map(authentication -> new SecurityContextImpl(authentication));
+                    return authenticationManager
+                            .authenticate(auth)
+                            .map(authentication -> new SecurityContextImpl(authentication));
                 });
     }
 

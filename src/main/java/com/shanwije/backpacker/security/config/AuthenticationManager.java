@@ -4,6 +4,7 @@ import com.shanwije.backpacker.security.documents.RoleDocument;
 import com.shanwije.backpacker.security.documents.UserDocument;
 import com.shanwije.backpacker.security.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,8 +30,10 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
         var token = authentication.getCredentials().toString();
+        if(!jwtUtil.isAccessToken(token)){
+            throw new BadCredentialsException("Not an access token");
+        }
         var username = jwtUtil.getUsernameFromToken(token);
-
         return userRepository.findByUsername(username)
                 .filter(Objects::nonNull)
                 .switchIfEmpty(Mono.error(new UsernameNotFoundException("Token associated User Account not found")))

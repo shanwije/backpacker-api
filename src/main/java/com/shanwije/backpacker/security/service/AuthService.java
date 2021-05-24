@@ -64,8 +64,7 @@ public class AuthService {
         String refreshToken = request.getRefreshToken();
         String id = request.getId();
             return jwtUtil.isRefreshTokenValid(refreshToken, id, userRepository)
-                    .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid refresh token")))
-                    .flatMap(userDetails -> jwtUtil.getRefreshTokenResponse(userDetails, refreshToken))
-                    .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid username or password")));
+                    .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid Id or refresh-token")))
+                    .flatMap(userDetails -> jwtUtil.getRefreshTokenResponse(userDetails, refreshToken));
     }
 }

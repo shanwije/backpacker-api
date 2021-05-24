@@ -8,6 +8,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,9 +23,10 @@ import java.util.stream.Collectors;
 @Component
 public class JWTUtil {
 
-    public String TOKEN_TYPE = "TOKEN_TYPE";
+    public static String TOKEN_TYPE = "TOKEN_TYPE";
     public String ID_TOKEN = "ID_TOKEN";
     public String USER_ID = "USER_ID";
+    public String USERNAME = "USERNAME";
     public static String ACCESS_TOKEN = "ACCESS_TOKEN";
     public static String REFRESH_TOKEN = "REFRESH_TOKEN";
 
@@ -71,8 +73,11 @@ public class JWTUtil {
         BCryptPasswordEncoder encorder = CustomPasswordEncoder.getPasswordEncoder();
         return userRepository
                 .findById(id)
-                .switchIfEmpty(Mono.error(new UsernameNotFoundException("Token associated User Account not found")))
-                .map(userDocument -> isRefreshTokenValid(id, encorder, userDocument, getClaimsFromToken(token)) ? userDocument : null);
+                .switchIfEmpty(Mono.error(new BadCredentialsException("Token associated User Account not found")))
+                .map(userDocument -> {
+                    if (isRefreshTokenValid(id, encorder, userDocument, getClaimsFromToken(token))) return userDocument;
+                    throw new BadCredentialsException("Invalid username or refresh-token");
+                });
     }
 
     private boolean isRefreshTokenValid(String id,
@@ -86,7 +91,7 @@ public class JWTUtil {
                                 encorder.matches(tokenId, claims.get(ID_TOKEN, String.class)));
     }
 
-    private Claims getClaimsFromToken(String token) {
+    public Claims getClaimsFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
@@ -103,6 +108,7 @@ public class JWTUtil {
         claims.put(ID_TOKEN, encorder.encode(tokenId));
         claims.put(TOKEN_TYPE, REFRESH_TOKEN);
         claims.put(USER_ID, userDocument.getId());
+        claims.put(USERNAME, userDocument.getUsername());
 
         return userRepository
                 .save(userDocument.addRefreshTokenId(tokenId))
@@ -113,6 +119,7 @@ public class JWTUtil {
         Map<String, Object> claims = new HashMap<>();
         claims.put(TOKEN_TYPE, ACCESS_TOKEN);
         claims.put(USER_ID, userDocument.getId());
+        claims.put(USERNAME, userDocument.getUsername());
         return Mono.just(getJwtToken(userDocument, accessTokenExpTimeInMills, claims));
     }
 
@@ -127,17 +134,8 @@ public class JWTUtil {
                 .compact();
     }
 
-//    public Claims getClaimsFromToken(String token) {
-//        return getClaims(token);
-//    }
-
-    public List<SimpleGrantedAuthority> getAuthoritiesFromToken(String token) {
-        List<String> rolesList = getClaimsFromToken(token).get("auth", List.class);
-        return rolesList.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-    }
-
     public String getUsernameFromToken(String token) {
-        return getClaimsFromToken(token).getSubject();
+        return getClaimsFromToken(token).get(USERNAME, String.class);
     }
 
     public Date getExpirationDate(String token) {
@@ -147,6 +145,18 @@ public class JWTUtil {
     // token expiration automatically handled by spring security
     public boolean isTokenExpired(String token) {
         return getExpirationDate(token).before(new Date());
+    }
+
+    public boolean isAccessToken(String token) {
+        return getClaimsFromToken(token)
+                .get(JWTUtil.TOKEN_TYPE, String.class)
+                .equals(JWTUtil.ACCESS_TOKEN);
+    }
+
+    public boolean isRefreshToken(String token) {
+        return getClaimsFromToken(token)
+                .get(JWTUtil.TOKEN_TYPE, String.class)
+                .equals(JWTUtil.REFRESH_TOKEN);
     }
 
     public boolean isTokenValid(String token) {
