@@ -10,4 +10,15 @@ public class BackpackerApplication {
         SpringApplication.run(BackpackerApplication.class, args);
     }
 
+//    @GetMapping("/auth-client")
+//    public Object getAuthorizedClient(@RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient client){
+//        System.out.println(client);
+//        return client;
+//    }
+//
+//    @GetMapping("/auth-user")
+//    public Object getUser(@AuthenticationPrincipal OAuth2User user){
+//        System.out.println(user);
+//        return user;
+//    }
 }
