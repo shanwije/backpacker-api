@@ -62,17 +62,10 @@ public class AuthService {
 
     public Mono<TokenResponse> refresh(TokenRequest request) {
         String refreshToken = request.getRefreshToken();
-        String username = request.getUsername();
-        if(jwtUtil.isTokenValid(refreshToken, username)){
-            return userRepository
-                    .findByUsername(username)
-                    .filter(Objects::nonNull)
-                    .switchIfEmpty(Mono.error(new UsernameNotFoundException("Token associated User Account not found")))
-                    .cast(UserDocument.class)
+        String id = request.getId();
+            return jwtUtil.isRefreshTokenValid(refreshToken, id, userRepository)
+                    .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid refresh token")))
                     .flatMap(userDetails -> jwtUtil.getRefreshTokenResponse(userDetails, refreshToken))
                     .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid username or password")));
-        } else {
-            throw new BadCredentialsException("Invalid refresh token");
-        }
     }
 }

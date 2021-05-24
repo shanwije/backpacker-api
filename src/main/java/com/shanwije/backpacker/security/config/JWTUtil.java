@@ -9,6 +9,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -20,7 +22,7 @@ import java.util.stream.Collectors;
 @Component
 public class JWTUtil {
 
-    public String TOKEN_TYPE ="TOKEN_TYPE";
+    public String TOKEN_TYPE = "TOKEN_TYPE";
     public String ID_TOKEN = "ID_TOKEN";
     public String USER_ID = "USER_ID";
     public static String ACCESS_TOKEN = "ACCESS_TOKEN";
@@ -53,23 +55,43 @@ public class JWTUtil {
 
     public Mono<TokenResponse> getSignInResponse(UserDocument userDocument, UserRepository userRepository) {
         return generateAccessToken(userDocument)
-                .map(accessToken -> generateRefreshToken(userDocument, userRepository).map(refreshToken -> new TokenResponse(
-                        accessToken,
-                        refreshToken,
-                        accessTokenExpTimeInMills,
-                        refreshTokenExpTimeInMills,
-                        tokenType
-                ))).cast(TokenResponse.class);
+                .flatMap(accessToken -> generateRefreshToken(userDocument, userRepository)
+                        .map(refreshToken ->
+                                new TokenResponse(
+                                accessToken,
+                                refreshToken,
+                                accessTokenExpTimeInMills,
+                                refreshTokenExpTimeInMills,
+                                tokenType
+                        )));
     }
 
     // TODO: 5/24/21 include device id in the validation
-    public Boolean isTokenValid(String token, String username) {
+    public Mono<UserDocument> isRefreshTokenValid(String token, String id, UserRepository userRepository) {
+        BCryptPasswordEncoder encorder = CustomPasswordEncoder.getPasswordEncoder();
+        return userRepository
+                .findById(id)
+                .switchIfEmpty(Mono.error(new UsernameNotFoundException("Token associated User Account not found")))
+                .map(userDocument -> isRefreshTokenValid(id, encorder, userDocument, getClaimsFromToken(token)) ? userDocument : null);
+    }
+
+    private boolean isRefreshTokenValid(String id,
+                                        BCryptPasswordEncoder encorder,
+                                        UserDocument userDocument,
+                                        Claims claims) {
+        return claims.get(TOKEN_TYPE, String.class).equals(REFRESH_TOKEN) &&
+                claims.get(USER_ID, String.class).equals(id) &&
+                userDocument.getRefreshTokenIds().stream()
+                        .anyMatch(tokenId ->
+                                encorder.matches(tokenId, claims.get(ID_TOKEN, String.class)));
+    }
+
+    private Claims getClaimsFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
-                .getBody().getSubject()
-                .equals(username);
+                .getBody();
     }
 
 
@@ -105,9 +127,9 @@ public class JWTUtil {
                 .compact();
     }
 
-    public Claims getClaimsFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
-    }
+//    public Claims getClaimsFromToken(String token) {
+//        return getClaims(token);
+//    }
 
     public List<SimpleGrantedAuthority> getAuthoritiesFromToken(String token) {
         List<String> rolesList = getClaimsFromToken(token).get("auth", List.class);

@@ -13,5 +13,5 @@ public class TokenRequest {
     @NotBlank(message = "Refresh token value can not be blank")
     private String refreshToken;
     @NotBlank(message = "Username can not be blank")
-    private String username;
+    private String id;
 }

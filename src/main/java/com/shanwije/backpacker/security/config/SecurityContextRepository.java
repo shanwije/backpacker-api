@@ -39,8 +39,7 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
         return Mono.justOrEmpty(serverWebExchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
                 .filter(b -> b.startsWith(tokenType))
                 .map(subs -> subs.substring(tokenType.length()))
-                .flatMap(token -> Mono.just(new UsernamePasswordAuthenticationToken(
-                        token, token)))
+                .flatMap(token -> Mono.just(new UsernamePasswordAuthenticationToken(token, token)))
                 .flatMap(auth -> {
                     return authenticationManager.authenticate(auth).map(authentication -> new SecurityContextImpl(authentication));
                 });
