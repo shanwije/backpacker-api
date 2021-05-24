@@ -1,7 +1,7 @@
 package com.shanwije.backpacker.security;
 
 import com.shanwije.backpacker.security.documents.UserDocument;
-import com.shanwije.backpacker.security.request.UserAuthenticationRequest;
+import com.shanwije.backpacker.security.request.SignInRequest;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -13,8 +13,8 @@ public class Validation {
     private Validation() {
     }
 
-    public static void validatePassword(PasswordEncoder passwordEncoder, UserAuthenticationRequest userAuthenticationRequest, UserDocument userDetails) {
-        if (!passwordEncoder.matches(userAuthenticationRequest.getPassword(), userDetails.getPassword())) {
+    public static void validatePassword(PasswordEncoder passwordEncoder, SignInRequest signInRequest, UserDocument userDetails) {
+        if (!passwordEncoder.matches(signInRequest.getPassword(), userDetails.getPassword())) {
             throw new BadCredentialsException("Invalid username or password");
         }
     }

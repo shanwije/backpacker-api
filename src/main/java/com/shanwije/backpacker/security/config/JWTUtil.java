@@ -1,12 +1,12 @@
 package com.shanwije.backpacker.security.config;
 
-import com.shanwije.backpacker.security.response.JwtTokenResponse;
+import com.shanwije.backpacker.security.documents.UserDocument;
+import com.shanwije.backpacker.security.response.TokenResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.util.Pair;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,14 +40,35 @@ public class JWTUtil {
         this.key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
     }
 
-    public JwtTokenResponse getJwtTokenResponse(UserDetails userDetails){
-        return new JwtTokenResponse(
+    // TODO: 5/24/21 keeping refresh and access token response generation separate for now. merge if it looks common in the future
+    public TokenResponse getJwtTokenResponse(UserDetails userDetails, String refreshToken){
+        return new TokenResponse(
+                generateToken(userDetails, ACCESS_TOKEN),
+                refreshToken,
+                Long.parseLong(accessTokenExpTimeInMills),
+                Long.parseLong(refreshTokenExpTimeInMills),
+                tokenType
+        );
+    }
+
+    public TokenResponse getJwtTokenResponse(UserDetails userDetails){
+        return new TokenResponse(
                 generateToken(userDetails, ACCESS_TOKEN),
                 generateToken(userDetails, REFRESH_TOKEN),
                 Long.parseLong(accessTokenExpTimeInMills),
                 Long.parseLong(refreshTokenExpTimeInMills),
                 tokenType
         );
+    }
+
+    // TODO: 5/24/21 include device id in the validation
+    public Boolean isTokenValid(String token, String username) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody().getSubject()
+                .equals(username);
     }
 
 
@@ -62,8 +84,6 @@ public class JWTUtil {
                 .collect(Collectors.toList());
 
         return Jwts.builder()
-                .claim("alg", "HS256")
-                .claim("typ", "JWT")
                 .setSubject(TOKEN_TYPE)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(now)
@@ -89,22 +109,12 @@ public class JWTUtil {
         return getClaimsFromToken(token).getExpiration();
     }
 
+    // token expiration automatically handled by spring security
     public boolean isTokenExpired(String token) {
         return getExpirationDate(token).before(new Date());
     }
 
     public boolean isTokenValid(String token) {
         return !isTokenExpired(token);
-    }
-
-
-    public enum Include {
-        EXCEPTION,
-        STACK_TRACE,
-        MESSAGE,
-        BINDING_ERRORS;
-
-        private Include() {
-        }
     }
 }

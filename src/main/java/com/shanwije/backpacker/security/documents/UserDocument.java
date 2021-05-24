@@ -1,6 +1,6 @@
 package com.shanwije.backpacker.security.documents;
 
-import com.shanwije.backpacker.security.request.UserRegistrationRequest;
+import com.shanwije.backpacker.security.request.SignUpRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,12 +32,12 @@ public class UserDocument implements UserDetails, CredentialsContainer {
     private boolean active;
     private List<RoleDocument> authorities = new ArrayList<>();
 
-    public UserDocument(UserRegistrationRequest req, RoleDocument defaultRole) {
+    public UserDocument(SignUpRequest req, RoleDocument defaultRole) {
         this.authorities.add(defaultRole);
         setUserRegistrationRequest(req);
     }
 
-    public void setUserRegistrationRequest(UserRegistrationRequest req) {
+    public void setUserRegistrationRequest(SignUpRequest req) {
         this.id = UUID.randomUUID().toString();
         this.username = req.getUsername();
         this.password = req.getPassword();

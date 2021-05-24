@@ -3,14 +3,13 @@ package com.shanwije.backpacker.controller;
 import com.shanwije.backpacker.config.core.ResponseWrapper;
 import com.shanwije.backpacker.security.authority.IsAdmin;
 import com.shanwije.backpacker.security.authority.IsUser;
-import com.shanwije.backpacker.security.request.UserRegistrationRequest;
+import com.shanwije.backpacker.security.request.SignUpRequest;
 import com.shanwije.backpacker.security.service.UsersDetailsService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -56,7 +55,7 @@ public class UsersController {
     @IsUser
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Mono<ResponseEntity<ResponseWrapper>> update(@PathVariable String id, @RequestBody UserRegistrationRequest userRequest) {
+    public Mono<ResponseEntity<ResponseWrapper>> update(@PathVariable String id, @RequestBody SignUpRequest userRequest) {
         userRequest.setPassword(null);
         return usersDetailsService.findById(id)
                 .flatMap(user1 -> usersDetailsService.update(user1.getId(), userRequest))

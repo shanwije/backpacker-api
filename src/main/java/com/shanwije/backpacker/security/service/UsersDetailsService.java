@@ -1,7 +1,7 @@
 package com.shanwije.backpacker.security.service;
 
 import com.shanwije.backpacker.security.repository.UserRepository;
-import com.shanwije.backpacker.security.request.UserRegistrationRequest;
+import com.shanwije.backpacker.security.request.SignUpRequest;
 import com.shanwije.backpacker.security.response.UserResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
@@ -41,7 +41,7 @@ public class UsersDetailsService implements ReactiveUserDetailsService {
         return userRepository.findById(id).flatMap(userRepository::delete);
     }
 
-    public Mono<UserResponse> update(String id, UserRegistrationRequest userRequest) {
+    public Mono<UserResponse> update(String id, SignUpRequest userRequest) {
         return userRepository.findById(id).flatMap(userDocument -> {
             userDocument.setUserRegistrationRequest(userRequest);
             return userRepository.save(userDocument).flatMap(userDocument1 ->

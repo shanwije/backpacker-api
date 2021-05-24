@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @NoArgsConstructor
 @Component
-public class JwtTokenResponse {
+public class TokenResponse {
 
     private String tokenType;
     private String accessToken;
@@ -19,7 +19,7 @@ public class JwtTokenResponse {
     private long accessTokenexpiresIn;
     private long refreshTokenExpiresIn;
 
-    public JwtTokenResponse(String accessToken, String refreshToken, long accessTokenexpiresIn, long refreshTokenExpiresIn, String tokenType) {
+    public TokenResponse(String accessToken, String refreshToken, long accessTokenexpiresIn, long refreshTokenExpiresIn, String tokenType) {
         this.tokenType = tokenType;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
