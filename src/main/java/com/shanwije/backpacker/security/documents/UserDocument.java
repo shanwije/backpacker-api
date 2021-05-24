@@ -10,9 +10,7 @@ import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 
 @Document(collection = "users")
@@ -31,6 +29,7 @@ public class UserDocument implements UserDetails, CredentialsContainer {
     private String lastName;
     private boolean active;
     private List<RoleDocument> authorities = new ArrayList<>();
+    private Set<String> refreshTokenIds = new HashSet<>();
 
     public UserDocument(SignUpRequest req, RoleDocument defaultRole) {
         this.authorities.add(defaultRole);
@@ -45,6 +44,16 @@ public class UserDocument implements UserDetails, CredentialsContainer {
         this.firstName = req.getFirstName();
         this.lastName = req.getLastName();
         this.active = true;
+    }
+
+    public UserDocument addRefreshTokenId(String tokenId) {
+        this.refreshTokenIds.add(tokenId);
+        return this;
+    }
+
+    public UserDocument removeRefreshTokenId(String tokenId) {
+        this.refreshTokenIds.remove(tokenId);
+        return this;
     }
 
     @Override
