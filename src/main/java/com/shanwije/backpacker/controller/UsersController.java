@@ -1,8 +1,8 @@
 package com.shanwije.backpacker.controller;
 
 import com.shanwije.backpacker.config.core.ResponseWrapper;
-import com.shanwije.backpacker.security.authority.IsAdmin;
 import com.shanwije.backpacker.security.authority.IsAUthorizedUser;
+import com.shanwije.backpacker.security.authority.IsAdmin;
 import com.shanwije.backpacker.security.request.SignUpRequest;
 import com.shanwije.backpacker.security.service.UsersDetailsService;
 import lombok.AllArgsConstructor;

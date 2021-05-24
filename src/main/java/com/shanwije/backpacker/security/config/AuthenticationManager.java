@@ -30,7 +30,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
         var token = authentication.getCredentials().toString();
-        if(!jwtUtil.isAccessToken(token)){
+        if (!jwtUtil.isAccessToken(token)) {
             throw new BadCredentialsException("Not an access token");
         }
         var username = jwtUtil.getUsernameFromToken(token);

@@ -6,19 +6,16 @@ import com.shanwije.backpacker.security.config.JWTUtil;
 import com.shanwije.backpacker.security.documents.UserDocument;
 import com.shanwije.backpacker.security.repository.RolesRepository;
 import com.shanwije.backpacker.security.repository.UserRepository;
-import com.shanwije.backpacker.security.request.TokenRequest;
 import com.shanwije.backpacker.security.request.SignInRequest;
 import com.shanwije.backpacker.security.request.SignUpRequest;
+import com.shanwije.backpacker.security.request.TokenRequest;
 import com.shanwije.backpacker.security.response.TokenResponse;
 import com.shanwije.backpacker.security.response.UserResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 
 @Service
@@ -63,8 +60,8 @@ public class AuthService {
     public Mono<TokenResponse> refresh(TokenRequest request) {
         String refreshToken = request.getRefreshToken();
         String id = request.getId();
-            return jwtUtil.isRefreshTokenValid(refreshToken, id, userRepository)
-                    .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid Id or refresh-token")))
-                    .flatMap(userDetails -> jwtUtil.getRefreshTokenResponse(userDetails, refreshToken));
+        return jwtUtil.isRefreshTokenValid(refreshToken, id, userRepository)
+                .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid Id or refresh-token")))
+                .flatMap(userDetails -> jwtUtil.getRefreshTokenResponse(userDetails, refreshToken));
     }
 }

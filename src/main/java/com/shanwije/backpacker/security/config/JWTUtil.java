@@ -9,29 +9,26 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 import java.security.Key;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class JWTUtil {
 
-    public static String TOKEN_TYPE = "TOKEN_TYPE";
-    public String ID_TOKEN = "ID_TOKEN";
-    public String USER_ID = "USER_ID";
-    public String USERNAME = "USERNAME";
-    public static String ACCESS_TOKEN = "ACCESS_TOKEN";
-    public static String REFRESH_TOKEN = "REFRESH_TOKEN";
-
-    private static final String AUTHORITIES_KEY = "auth";
-
+    public static final String TOKEN_TYPE = "TOKEN_TYPE";
+    public static final String ACCESS_TOKEN = "ACCESS_TOKEN";
+    public static final String REFRESH_TOKEN = "REFRESH_TOKEN";
+    public static final String ID_TOKEN = "ID_TOKEN";
+    public static final String USER_ID = "USER_ID";
+    public static final String USERNAME = "USERNAME";
     @Value("${jjwt.token.type}")
     private String tokenType;
     @Value("${jjwt.accesstoken.expiration}")
@@ -60,12 +57,12 @@ public class JWTUtil {
                 .flatMap(accessToken -> generateRefreshToken(userDocument, userRepository)
                         .map(refreshToken ->
                                 new TokenResponse(
-                                accessToken,
-                                refreshToken,
-                                accessTokenExpTimeInMills,
-                                refreshTokenExpTimeInMills,
-                                tokenType
-                        )));
+                                        accessToken,
+                                        refreshToken,
+                                        accessTokenExpTimeInMills,
+                                        refreshTokenExpTimeInMills,
+                                        tokenType
+                                )));
     }
 
     // TODO: 5/24/21 include device id in the validation
@@ -102,7 +99,7 @@ public class JWTUtil {
 
     public Mono<String> generateRefreshToken(UserDocument userDocument, UserRepository userRepository) {
         var encorder = CustomPasswordEncoder.getPasswordEncoder();
-        String tokenId = UUID.randomUUID().toString();
+        var tokenId = UUID.randomUUID().toString();
 
         Map<String, Object> claims = new HashMap<>();
         claims.put(ID_TOKEN, encorder.encode(tokenId));

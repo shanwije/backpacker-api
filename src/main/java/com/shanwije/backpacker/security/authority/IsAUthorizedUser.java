@@ -11,4 +11,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @PreAuthorize(value = "hasRole('ROLE_USER')" + "and authentication.principal.equals(#id)"
         + "or hasAnyRole('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
-public @interface IsAUthorizedUser {}
+public @interface IsAUthorizedUser {
+}
