@@ -1,0 +1,31 @@
+version: "3"
+services:
+
+  java:
+    build:
+      context: ./
+    tty: true
+    ports:
+      - "8080:8080"
+    container_name: spring
+    links:
+      - mongo
+    depends_on:
+      - mongo
+    networks:
+      - shared-net
+
+  mongo:
+    image: 'mongo'
+    tty: true
+    ports:
+      - 27017:27017
+    container_name: mongo
+    volumes:
+      - /home/sinoed/data/db:/data/db
+    networks:
+      - shared-net
+
+networks:
+  shared-net:
+    driver: bridge
