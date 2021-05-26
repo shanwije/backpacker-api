@@ -1,24 +1,29 @@
-version: "2"
+version: "3"
 services:
-  springboot:
-    build: .
-    container_name: spring-app
+
+  java:
+    build:
+      context: ./
     ports:
-      - 8080:8080
-    depends_on:
-      - mongo
+      - "8080:8080"
+    container_name: spring
     links:
       - mongo
+    depends_on:
+      - mongo
     networks:
-      - myNetwork
+      - shared-net
+
   mongo:
-    image: mongo
-    container_name: spring-mongodb
+    image: 'mongo'
     ports:
       - 27017:27017
-    command: mongod --logpath=/dev/null # --quiet
+    container_name: mongo
+    volumes:
+      - /home/sinoed/data/db:/data/db
     networks:
-      - myNetwork
+      - shared-net
+
 networks:
-  myNetwork:
+  shared-net:
     driver: bridge
