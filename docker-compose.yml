@@ -1,0 +1,20 @@
+version: "2"
+services:
+  springboot:
+    build: .
+    container_name: spring-app
+    ports:
+      - 8080:8080
+    networks:
+      - myNetwork
+  mongo:
+    image: mongo
+    container_name: spring-mongodb
+    ports:
+      - 27017:27017
+    command: mongod --logpath=/dev/null # --quiet
+    networks:
+      - myNetwork
+networks:
+  myNetwork:
+    driver: bridge
