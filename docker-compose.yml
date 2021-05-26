@@ -4,6 +4,7 @@ services:
   java:
     build:
       context: ./
+    tty: true
     ports:
       - "8080:8080"
     container_name: spring
@@ -16,6 +17,7 @@ services:
 
   mongo:
     image: 'mongo'
+    tty: true
     ports:
       - 27017:27017
     container_name: mongo
