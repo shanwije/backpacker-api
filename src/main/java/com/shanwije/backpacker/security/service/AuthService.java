@@ -31,15 +31,22 @@ public class AuthService {
     public Mono<UserResponse> signUp(SignUpRequest signUpRequest) {
 
         return userRepository.findByUsername(signUpRequest.getUsername())
-                .flatMap(existingUser -> Mono.error(new BadCredentialsException(signUpRequest.getUsername() + " : username already exist")))
-                .switchIfEmpty(Mono.defer(() -> {
-                    signUpRequest.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-                    return rolesRepository.findByAuthority("ROLE_USER").flatMap(defaultRole -> {
-                        var userDocument = new UserDocument(signUpRequest, defaultRole);
-                        return userRepository.save(userDocument).flatMap(userDocument1 ->
-                                Mono.just(new UserResponse(userDocument1)));
-                    });
-                })).cast(UserResponse.class);
+                .flatMap(existingUser ->
+                        Mono.error(
+                                new BadCredentialsException(signUpRequest.getUsername()
+                                        + " : username already exist")))
+                .switchIfEmpty(Mono.defer(() -> userRepository.findByEmail(signUpRequest.getEmail())
+                        .flatMap(existingUser -> Mono.error(
+                                new BadCredentialsException(signUpRequest.getUsername()
+                                        + " : email already exist")))
+                        .switchIfEmpty(Mono.defer(() -> {
+                            signUpRequest.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+                            return rolesRepository.findByAuthority("ROLE_USER").flatMap(defaultRole -> {
+                                var userDocument = new UserDocument(signUpRequest, defaultRole);
+                                return userRepository.save(userDocument).flatMap(userDocument1 ->
+                                        Mono.just(new UserResponse(userDocument1)));
+                            });
+                        })).cast(UserResponse.class))).cast(UserResponse.class);
     }
 
     public Mono<TokenResponse> signIn(SignInRequest signInRequest) {
