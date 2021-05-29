@@ -11,11 +11,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class ConcurrentContext {
 
-    private ConcurrentContext() {
-    }
-
     @NonNull
     private static Map<String, String> contextMap = new ConcurrentHashMap<>();
+
+    private ConcurrentContext() {
+    }
 
     public static void put(String key, String val) {
         if (key == null) {

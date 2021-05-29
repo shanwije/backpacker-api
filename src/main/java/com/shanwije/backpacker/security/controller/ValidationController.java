@@ -2,11 +2,6 @@ package com.shanwije.backpacker.security.controller;
 
 import com.shanwije.backpacker.config.core.ResponseWrapper;
 import com.shanwije.backpacker.security.request.ExisitingRequest;
-import com.shanwije.backpacker.security.request.SignInRequest;
-import com.shanwije.backpacker.security.request.SignUpRequest;
-import com.shanwije.backpacker.security.request.TokenRequest;
-import com.shanwije.backpacker.security.response.TokenResponse;
-import com.shanwije.backpacker.security.service.AuthService;
 import com.shanwije.backpacker.security.service.ValidationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;

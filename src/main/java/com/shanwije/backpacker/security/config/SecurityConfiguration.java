@@ -48,7 +48,6 @@ public class SecurityConfiguration {
                                 .pathMatchers("/auth/**").permitAll()
                                 .pathMatchers("/**").authenticated()
                 ).exceptionHandling()
-//                .accessDeniedHandler(new HttpStatusServerAccessDeniedHandler(HttpStatus.BAD_REQUEST))
                 .authenticationEntryPoint((exchange, exception) -> Mono.error(exception))
                 .accessDeniedHandler((res, err) -> Mono.error(err))
                 .and()
