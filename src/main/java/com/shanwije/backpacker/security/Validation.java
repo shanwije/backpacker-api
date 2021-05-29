@@ -8,14 +8,18 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.function.Predicate;
+
 public class Validation {
 
     private Validation() {
     }
 
+    public static Predicate<String> isValidString = (s)-> ( s != null && !s.isEmpty());
+
     public static void validatePassword(PasswordEncoder passwordEncoder, SignInRequest signInRequest, UserDocument userDetails) {
         if (!passwordEncoder.matches(signInRequest.getPassword(), userDetails.getPassword())) {
-            throw new BadCredentialsException("Invalid username or password");
+            throw new BadCredentialsException("Invalid credentials");
         }
     }
 
@@ -31,5 +35,12 @@ public class Validation {
                     "User account has expired");
         }
         return true;
+    }
+
+    public static UserDocument authenticateAndValidateUser(PasswordEncoder passwordEncoder,
+                                                           SignInRequest signInRequest, UserDocument userDetails) {
+        validatePassword(passwordEncoder, signInRequest, userDetails);
+        validateAccount(userDetails);
+        return userDetails;
     }
 }

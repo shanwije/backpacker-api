@@ -73,7 +73,7 @@ public class JWTUtil {
                 .switchIfEmpty(Mono.error(new BadCredentialsException("Token associated User Account not found")))
                 .map(userDocument -> {
                     if (isRefreshTokenValid(id, encorder, userDocument, getClaimsFromToken(token))) return userDocument;
-                    throw new BadCredentialsException("Invalid username or refresh-token");
+                    throw new BadCredentialsException("Invalid credentials");
                 });
     }
 
