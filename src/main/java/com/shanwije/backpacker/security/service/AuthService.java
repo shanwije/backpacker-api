@@ -1,6 +1,5 @@
 package com.shanwije.backpacker.security.service;
 
-import com.shanwije.backpacker.security.Validation;
 import com.shanwije.backpacker.security.config.AuthenticationManager;
 import com.shanwije.backpacker.security.config.JWTUtil;
 import com.shanwije.backpacker.security.documents.UserDocument;
@@ -17,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import static com.shanwije.backpacker.security.Validation.*;
+
 
 @Service
 @AllArgsConstructor
@@ -31,29 +32,39 @@ public class AuthService {
     public Mono<UserResponse> signUp(SignUpRequest signUpRequest) {
 
         return userRepository.findByUsername(signUpRequest.getUsername())
-                .flatMap(existingUser -> Mono.error(new BadCredentialsException(signUpRequest.getUsername() + " : username already exist")))
-                .switchIfEmpty(Mono.defer(() -> {
-                    signUpRequest.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-                    return rolesRepository.findByAuthority("ROLE_USER").flatMap(defaultRole -> {
-                        var userDocument = new UserDocument(signUpRequest, defaultRole);
-                        return userRepository.save(userDocument).flatMap(userDocument1 ->
-                                Mono.just(new UserResponse(userDocument1)));
-                    });
-                })).cast(UserResponse.class);
+                .flatMap(existingUser ->
+                        Mono.error(
+                                new BadCredentialsException(signUpRequest.getUsername()
+                                        + " : username already exist")))
+                .switchIfEmpty(Mono.defer(() -> userRepository.findByEmail(signUpRequest.getEmail())
+                        .flatMap(existingUser -> Mono.error(
+                                new BadCredentialsException(signUpRequest.getUsername()
+                                        + " : email already exist")))
+                        .switchIfEmpty(Mono.defer(() -> {
+                            signUpRequest.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+                            return rolesRepository.findByAuthority("ROLE_USER").flatMap(defaultRole -> {
+                                var userDocument = new UserDocument(signUpRequest, defaultRole);
+                                return userRepository.save(userDocument).flatMap(userDocument1 ->
+                                        Mono.just(new UserResponse(userDocument1)));
+                            });
+                        })).cast(UserResponse.class))).cast(UserResponse.class);
     }
 
     public Mono<TokenResponse> signIn(SignInRequest signInRequest) {
-        return userRepository
-                .findByUsername(signInRequest.getUsername())
-                .map(userDetails -> authenticateAndValidateUser(signInRequest, userDetails))
-                .flatMap((UserDocument userDocument) -> jwtUtil.getSignInResponse(userDocument, userRepository))
-                .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid username or password")));
-    }
 
-    private UserDocument authenticateAndValidateUser(SignInRequest signInRequest, UserDocument userDetails) {
-        Validation.validatePassword(passwordEncoder, signInRequest, userDetails);
-        Validation.validateAccount(userDetails);
-        return userDetails;
+        var email = signInRequest.getEmail();
+        var username = signInRequest.getUsername();
+
+        if (isValidString.test(email) || isValidString.test(username)) {
+            var MonoUserDocument = isValidString.test(username)
+                    ? userRepository.findByUsername(username)
+                    : userRepository.findByEmail(email);
+            return MonoUserDocument
+                    .map(userDetails -> authenticateAndValidateUser(passwordEncoder, signInRequest, userDetails))
+                    .flatMap((UserDocument userDocument) -> jwtUtil.getSignInResponse(userDocument, userRepository))
+                    .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid credentials")));
+        }
+        throw new BadCredentialsException("Invalid credentials");
     }
 
 
@@ -61,7 +72,7 @@ public class AuthService {
         String refreshToken = request.getRefreshToken();
         String id = request.getId();
         return jwtUtil.isRefreshTokenValid(refreshToken, id, userRepository)
-                .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid Id or refresh-token")))
+                .switchIfEmpty(Mono.error(new BadCredentialsException("Invalid credentials")))
                 .flatMap(userDetails -> jwtUtil.getRefreshTokenResponse(userDetails, refreshToken));
     }
 }
