@@ -133,20 +133,33 @@ public class JWTUtil {
                 .compact();
     }
 
+    public String getUsernameFromClaims(Claims claims) {
+        return claims.get(USERNAME, String.class);
+    }
+
     public String getUsernameFromToken(String token) {
-        return getClaimsFromToken(token).get(USERNAME, String.class);
+        return getUsernameFromClaims(getClaimsFromToken(token));
+    }
+
+    public String getIdFromClaims(Claims claims){
+        return claims.get(USER_ID, String.class);
     }
 
     public String getIdFromToken(String token) {
-        return getClaimsFromToken(token).get(USER_ID, String.class);
+        return getIdFromClaims(getClaimsFromToken(token));
     }
 
-    public ArrayList<SimpleGrantedAuthority> getAuthoritiesFromToken(String token) {
-        return (ArrayList<SimpleGrantedAuthority>) getClaimsFromToken(token)
+    public ArrayList<SimpleGrantedAuthority> getAuthoritiesFromClaims(Claims claims){
+        return (ArrayList<SimpleGrantedAuthority>) claims
                 .get(USER_ROLES, List.class)
                 .stream()
                 .map(role -> new SimpleGrantedAuthority((String) role))
                 .collect(Collectors.toList());
+    }
+
+    public ArrayList<SimpleGrantedAuthority> getAuthoritiesFromToken(String token) {
+        return getAuthoritiesFromClaims(getClaimsFromToken(token));
+
     }
 
     public Date getExpirationDate(String token) {

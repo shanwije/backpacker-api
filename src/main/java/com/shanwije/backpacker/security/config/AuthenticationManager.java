@@ -3,6 +3,7 @@ package com.shanwije.backpacker.security.config;
 import com.shanwije.backpacker.security.documents.RoleDocument;
 import com.shanwije.backpacker.security.documents.UserDocument;
 import com.shanwije.backpacker.security.repository.UserRepository;
+import io.jsonwebtoken.Claims;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -34,9 +35,10 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
         if (!jwtUtil.isAccessToken(token)) {
             throw new BadCredentialsException("Not an access token");
         }
-        var userid = jwtUtil.getIdFromToken(token);
+        Claims claims = jwtUtil.getClaimsFromToken(token);
         ArrayList<SimpleGrantedAuthority> authorities = jwtUtil.getAuthoritiesFromToken(token);
-        return Mono.just(new UsernamePasswordAuthenticationToken(userid, null, authorities));
+        return Mono.just(new UsernamePasswordAuthenticationToken(
+                jwtUtil.getIdFromClaims(claims), null, jwtUtil.getAuthoritiesFromClaims(claims)));
     }
 
     public Mono<Authentication> authenticateByDB(Authentication authentication) {
