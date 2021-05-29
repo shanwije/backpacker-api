@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -29,6 +30,16 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
+        var token = authentication.getCredentials().toString();
+        if (!jwtUtil.isAccessToken(token)) {
+            throw new BadCredentialsException("Not an access token");
+        }
+        var userid = jwtUtil.getIdFromToken(token);
+        ArrayList<SimpleGrantedAuthority> authorities = jwtUtil.getAuthoritiesFromToken(token);
+        return Mono.just(new UsernamePasswordAuthenticationToken(userid, null, authorities));
+    }
+
+    public Mono<Authentication> authenticateByDB(Authentication authentication) {
         var token = authentication.getCredentials().toString();
         if (!jwtUtil.isAccessToken(token)) {
             throw new BadCredentialsException("Not an access token");

@@ -9,16 +9,15 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class JWTUtil {
@@ -29,6 +28,7 @@ public class JWTUtil {
     public static final String ID_TOKEN = "ID_TOKEN";
     public static final String USER_ID = "USER_ID";
     public static final String USERNAME = "USERNAME";
+    public static final String USER_ROLES = "USER_ROLES";
     @Value("${jjwt.token.type}")
     private String tokenType;
     @Value("${jjwt.accesstoken.expiration}")
@@ -115,6 +115,8 @@ public class JWTUtil {
     public Mono<String> generateAccessToken(UserDocument userDocument) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(TOKEN_TYPE, ACCESS_TOKEN);
+        claims.put(USER_ROLES, userDocument.getAuthorities()
+                .stream().map(roleDocument -> roleDocument.getAuthority()).collect(Collectors.toList()));
         claims.put(USER_ID, userDocument.getId());
         claims.put(USERNAME, userDocument.getUsername());
         return Mono.just(getJwtToken(userDocument, accessTokenExpTimeInMills, claims));
@@ -133,6 +135,18 @@ public class JWTUtil {
 
     public String getUsernameFromToken(String token) {
         return getClaimsFromToken(token).get(USERNAME, String.class);
+    }
+
+    public String getIdFromToken(String token) {
+        return getClaimsFromToken(token).get(USER_ID, String.class);
+    }
+
+    public ArrayList<SimpleGrantedAuthority> getAuthoritiesFromToken(String token) {
+        return (ArrayList<SimpleGrantedAuthority>) getClaimsFromToken(token)
+                .get(USER_ROLES, List.class)
+                .stream()
+                .map(role -> new SimpleGrantedAuthority((String) role))
+                .collect(Collectors.toList());
     }
 
     public Date getExpirationDate(String token) {
