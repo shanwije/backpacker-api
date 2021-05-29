@@ -44,7 +44,7 @@ public class SecurityConfiguration {
                                 .pathMatchers("/swagger-ui/**").permitAll()
                                 .pathMatchers("/v2/api-docs").permitAll()
                                 .pathMatchers("/roles").permitAll()
-                                .pathMatchers("/roles/**").permitAll()// TODO: 5/23/21 remove roles from permitted paths
+                                .pathMatchers("/validation/is-unique").permitAll() // TODO: 5/23/21 remove roles from permitted paths
                                 .pathMatchers("/auth/**").permitAll()
                                 .pathMatchers("/**").authenticated()
                 ).exceptionHandling()
